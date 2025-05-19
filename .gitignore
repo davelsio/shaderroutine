@@ -1,0 +1,29 @@
+# modules
+node_modules/
+pnpm-debug.*
+
+# build
+dist/
+web-build/
+
+# expo
+expo-env.d.ts
+
+# native
+ios/
+android/
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.turbo/
+.vscode/
