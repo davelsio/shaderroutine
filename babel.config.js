@@ -1,7 +1,7 @@
 /** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
 const unistylesOptions = {
   autoProcessRoot: '.',
-  debug: __DEV__,
+  debug: process.env.NODE_ENV === 'development',
 };
 
 module.exports = function (api) {
