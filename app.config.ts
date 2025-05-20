@@ -6,7 +6,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   slug: 'shaderroutine',
   version: '0.1.0',
   orientation: 'portrait',
-  icon: './assets/images/icon.png',
+  icon: './assets/app/icon.png',
   scheme: 'com.davelsan.shaderroutine',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
@@ -14,16 +14,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: false,
     bundleIdentifier: 'com.davelsan.shaderroutine',
     icon: {
-      dark: './assets/images/icon-ios-dark.png',
-      light: './assets/images/icon-ios-light.png',
-      tinted: './assets/images/icon-ios-tinted.png',
+      dark: './assets/app/icon-ios-dark.png',
+      light: './assets/app/icon-ios-light.png',
+      tinted: './assets/app/icon-ios-tinted.png',
     },
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './assets/images/adaptive-icon.png',
+      foregroundImage: './assets/app/adaptive-icon.png',
       backgroundColor: '#ffffff',
-      // backgroundImage: './assets/images/adaptive-icon-background.png',
+      // backgroundImage: './assets/app/adaptive-icon-background.png',
     },
     package: 'com.davelsan.shaderroutine',
   },
@@ -31,7 +31,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-asset',
       {
-        assets: ['./assets/images'],
+        assets: ['./assets/app', './assets/app', './assets/textures'],
       },
     ],
     [
@@ -53,22 +53,22 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-splash-screen',
       {
         ios: {
-          image: './assets/images/splash.png',
+          image: './assets/app/splash.png',
           resizeMode: 'contain',
           backgroundColor: '#ffffff',
           imageWidth: 200,
           dark: {
-            image: './assets/images/splash-dark.png',
+            image: './assets/app/splash-dark.png',
             backgroundColor: '#000000',
           },
         },
         android: {
-          image: './assets/images/splash.png',
+          image: './assets/app/splash.png',
           resizeMode: 'contain',
           backgroundColor: '#ffffff',
           imageWidth: 150,
           dark: {
-            image: './assets/images/splash-dark.png',
+            image: './assets/app/splash-dark.png',
             backgroundColor: '#000000',
           },
         },
