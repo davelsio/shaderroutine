@@ -2,29 +2,13 @@ import { Asset } from 'expo-asset';
 import { useCallback, useEffect, useState } from 'react';
 import * as FileSystem from 'expo-file-system';
 
+import { type ShaderName, shaderModules } from '@shaders/modules';
 import { withAbort } from '@utils/withAbort';
 import { resolveNodeDependencies } from '@utils/resolveNodeDependencies';
 
-type ModuleName = 'inverseLerp' | 'remap';
+const shaderCache = new Map<ShaderName, string>();
 
-type ShaderModule = {
-  module: number;
-  dependencies?: ModuleName[];
-};
-
-const shaderModules: Record<ModuleName, ShaderModule> = {
-  inverseLerp: {
-    module: require('../shaders/glsl/inverseLerp.glsl'),
-  },
-  remap: {
-    module: require('../shaders/glsl/remap.glsl'),
-    dependencies: ['inverseLerp'],
-  },
-};
-
-const shaderCache = new Map<ModuleName, string>();
-
-async function loadShaderModule(name: ModuleName) {
+async function loadShaderModule(name: ShaderName) {
   if (shaderCache.has(name)) {
     return shaderCache.get(name);
   }
@@ -48,13 +32,13 @@ async function loadShaderModule(name: ModuleName) {
   return shader;
 }
 
-export function useShader(source: string, modules: ModuleName[]) {
+export function useShader(source: string, modules: ShaderName[]) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [shader, setShader] = useState<string | null>(null);
 
-  const compileShader = useCallback(
-    async (_source: string, _modules: ModuleName[]) => {
+  const composeShader = useCallback(
+    async (_source: string, _modules: ShaderName[]) => {
       const loadedModules = await Promise.all(
         _modules.map((module) => loadShaderModule(module))
       );
@@ -69,9 +53,9 @@ export function useShader(source: string, modules: ModuleName[]) {
     const sortedModules = resolveNodeDependencies(shaderModules, modules);
 
     setLoading(true);
-    compileShader(source, sortedModules)
-      .then((compiledShader) => {
-        withAbort(() => setShader(compiledShader), abortController);
+    composeShader(source, sortedModules)
+      .then((shader) => {
+        withAbort(() => setShader(shader), abortController);
       })
       .catch((error) => {
         withAbort(() => setError(error.message), abortController);
@@ -84,11 +68,11 @@ export function useShader(source: string, modules: ModuleName[]) {
     return () => {
       abortController.abort();
     };
-  }, [compileShader, modules, source]);
+  }, [composeShader, modules, source]);
 
   return {
-    shader,
     error,
     loading,
+    shader,
   };
 }
