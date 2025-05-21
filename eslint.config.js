@@ -43,6 +43,9 @@ module.exports = defineConfig([
         },
       ],
 
+      // Disable the array notation police
+      '@typescript-eslint/array-type': 'off',
+
       // Disable empty interface warnings in module augmentation
       '@typescript-eslint/no-empty-object-type': 'off',
     },
