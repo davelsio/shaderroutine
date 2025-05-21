@@ -17,6 +17,8 @@ const config = getDefaultConfig(projectRoot, {
   isCSSEnabled: true,
 });
 
+config.resolver.assetExts.push('glsl');
+
 /**
  * Opt-out of the new ES Modules resolution.
  * @see https://docs.expo.dev/versions/latest/config/metro/#es-module-resolution

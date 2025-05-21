@@ -48,6 +48,17 @@ module.exports = defineConfig([
 
       // Disable empty interface warnings in module augmentation
       '@typescript-eslint/no-empty-object-type': 'off',
+
+      // Extend Expo config to allow GLSL files
+      // https://github.com/expo/expo/blob/main/packages/eslint-config-expo/utils/typescript.js#L59
+      '@typescript-eslint/no-require-imports': [
+        'warn',
+        {
+          allow: [
+            '\\.(aac|aiff|avif|bmp|caf|db|gif|glsl|heic|html|jpeg|jpg|json|m4a|m4v|mov|mp3|mp4|mpeg|mpg|otf|pdf|png|psd|svg|ttf|wav|webm|webp|xml|yaml|yml|zip)$',
+          ],
+        },
+      ],
     },
   },
   /**
