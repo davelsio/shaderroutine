@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@typography/Text';
 
-import styles from './HomeView.styles';
+import styles from './Typography.styles';
 
 export function HomeView() {
   return (
