@@ -1,33 +1,28 @@
-type TreeNode<T extends string> = {
+type Node<T> = {
   dependencies?: T[];
 };
 
 /**
- * Resolve a sorted list of node dependencies in a tree data structure.
+ * Resolve a sorted list of node dependencies from a tree data structure.
  * @param tree tree object data structure
- * @param nodesToLoad nodes to load from the tree
  */
-export function resolveNodeDependencies<
-  NodeName extends string,
-  Node extends TreeNode<NodeName>,
->(tree: Record<NodeName, Node>, nodesToLoad: NodeName[]): NodeName[] {
-  const visited = new Set<NodeName>();
-  const resolved: NodeName[] = [];
+export function resolveNodeDependencies<T extends Node<T>>(tree: T): T[] {
+  const visited = new Set<T>();
+  const resolved: T[] = [];
 
-  function depthFirstSearch(nodeName: NodeName) {
-    if (visited.has(nodeName)) return;
+  function depthFirstSearch(node: T) {
+    if (visited.has(node)) return;
 
-    visited.add(nodeName);
+    visited.add(node);
 
-    const node = tree[nodeName];
-    if (node?.dependencies) {
+    if (node.dependencies) {
       node.dependencies.forEach((dep) => depthFirstSearch(dep));
     }
 
-    resolved.push(nodeName);
+    resolved.push(node);
   }
 
-  nodesToLoad.forEach(depthFirstSearch);
+  depthFirstSearch(tree);
 
   return resolved;
 }
