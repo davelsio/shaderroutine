@@ -55,7 +55,7 @@ module.exports = defineConfig([
         'warn',
         {
           allow: [
-            '\\.(aac|aiff|avif|bmp|caf|db|gif|glsl|heic|html|jpeg|jpg|json|m4a|m4v|mov|mp3|mp4|mpeg|mpg|otf|pdf|png|psd|svg|ttf|wav|webm|webp|xml|yaml|yml|zip)$',
+            '\\.(aac|aiff|avif|bmp|caf|db|gif|glsl|heic|html|jpeg|jpg|json|m4a|m4v|mov|mp3|mp4|mpeg|mpg|otf|pdf|png|psd|sksl|svg|ttf|wav|webm|webp|xml|yaml|yml|zip)$',
           ],
         },
       ],

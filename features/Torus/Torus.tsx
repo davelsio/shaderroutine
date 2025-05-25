@@ -1,11 +1,9 @@
 import {
   Canvas,
   Fill,
-  ImageShader,
   Shader,
   Skia,
   useClock,
-  useImage,
   vec,
 } from '@shopify/react-native-skia';
 import { useUnistyles } from 'react-native-unistyles';
@@ -13,32 +11,38 @@ import { useMemo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { useShader } from '@hooks/useShader';
-import { remap } from '@shaders/remap';
 import type { ShaderModule } from '@shaders/modules';
 
-import styles from './Cathode.styles';
+import styles from './Torus.styles';
 
-const cathodeSkShader: ShaderModule = {
-  module: require('./Cathode.sksl'),
-  dependencies: [remap],
+export interface Vector3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+const torusSkShader: ShaderModule = {
+  module: require('./Torus.sksl'),
 };
 
-const imageURI =
-  'https://cdn.dribbble.com/users/3281732/screenshots/13130602/media/592ccac0a949b39f058a297fd1faa38e.jpg?compress=1&resize=800x800';
-
-export function CathodeView() {
+export function TorusView() {
   const { rt } = useUnistyles();
   const clock = useClock();
-  const image = useImage(imageURI);
 
-  const { shader } = useShader(cathodeSkShader);
+  const { shader } = useShader(torusSkShader);
   const skShader = useMemo(
     () => (shader ? Skia.RuntimeEffect.Make(shader) : null),
     [shader]
   );
 
   const uniforms = useDerivedValue(() => ({
+    uPaletteShift: 0.0,
+    uColorTint: [6.0, 6.0, 6.0],
+    uDirection: -1.0,
+    uSphereSize: 1.2,
+    uPositionOffset: [0.0, 0.0, 0.0], // Use array format for vec3 uniform
     uResolution: vec(rt.screen.width, rt.screen.height),
+    uSpeed: 0.5,
     uTime: clock.value / 1000, // convert to seconds
   }));
 
@@ -49,14 +53,7 @@ export function CathodeView() {
   return (
     <Canvas style={styles.canvas}>
       <Fill>
-        <Shader source={skShader} uniforms={uniforms}>
-          <ImageShader
-            image={image}
-            fit="cover"
-            width={rt.screen.width}
-            height={rt.screen.height}
-          />
-        </Shader>
+        <Shader source={skShader} uniforms={uniforms} />
       </Fill>
     </Canvas>
   );
