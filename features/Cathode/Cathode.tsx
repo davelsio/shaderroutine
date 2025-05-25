@@ -19,14 +19,14 @@ import type { ShaderModule } from '@shaders/modules';
 import styles from './Cathode.styles';
 
 const cathodeSkShader: ShaderModule = {
-  module: require('./Cathode.glsl'),
+  module: require('./Cathode.sksl'),
   dependencies: [remap],
 };
 
 const imageURI =
   'https://cdn.dribbble.com/users/3281732/screenshots/13130602/media/592ccac0a949b39f058a297fd1faa38e.jpg?compress=1&resize=800x800';
 
-export function Cathode() {
+export function CathodeView() {
   const { rt } = useUnistyles();
   const clock = useClock();
   const image = useImage(imageURI);

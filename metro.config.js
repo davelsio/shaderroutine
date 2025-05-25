@@ -17,7 +17,7 @@ const config = getDefaultConfig(projectRoot, {
   isCSSEnabled: true,
 });
 
-config.resolver.assetExts.push('glsl');
+config.resolver.assetExts.push('glsl', 'sksl');
 
 /**
  * Opt-out of the new ES Modules resolution.
