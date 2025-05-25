@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ThemeProvider } from '@theme/Provider';
 
@@ -10,10 +11,12 @@ export default function RootLayout() {
   return (
     <KeyboardProvider>
       <ThemeProvider>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <GestureHandlerRootView>
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </GestureHandlerRootView>
       </ThemeProvider>
     </KeyboardProvider>
   );

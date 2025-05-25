@@ -4,6 +4,7 @@ uniform float uDirection;
 uniform vec2 uResolution;
 uniform float uPaletteShift;
 uniform vec3 uPositionOffset;
+uniform float uRotation;
 uniform float uSpeed;
 uniform float uSphereSize;
 uniform float uTime;
@@ -75,6 +76,12 @@ mat3 calcLookAtMatrix(vec3 ro, vec3 ta, vec3 up) {
   return mat3(uu, vv, ww);
 }
 
+mat2 rotate2d(float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+  return mat2(c, -s, s, c);
+}
+
 vec4 main(vec2 pxCoords) {
   vec2 uv = pxCoords / uResolution;
 
@@ -89,6 +96,9 @@ vec4 main(vec2 pxCoords) {
   // sphere size
   float focalLength = 2.0;
   vec2 p = (uv * 2.0 - 1.0) * vec2(uResolution.x / uResolution.y, 1.0);
+
+  // sphere rotation
+  p *= rotate2d(uRotation);
 
   vec3 rayDirection = normalize(camMat * vec3(p, focalLength));
   vec3 rayPosition = camPos;
