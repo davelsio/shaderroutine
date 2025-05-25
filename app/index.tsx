@@ -1,5 +1,5 @@
-import { CathodeView } from '@features/Cathode';
+import { TorusView } from '@features/Torus';
 
 export default function HomeScreen() {
-  return <CathodeView />;
+  return <TorusView />;
 }
