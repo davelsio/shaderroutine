@@ -12,6 +12,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 
 import { useShader } from '@hooks/useShader';
 import type { ShaderModule } from '@shaders/modules';
+import { vec3 } from '@helpers/skia/vec3';
 
 import styles from './Torus.styles';
 
@@ -37,10 +38,10 @@ export function TorusView() {
 
   const uniforms = useDerivedValue(() => ({
     uPaletteShift: 0.0,
-    uColorTint: [6.0, 6.0, 6.0],
+    uColorTint: vec3(6.0, 6.0, 6.0),
     uDirection: -1.0,
     uSphereSize: 1.2,
-    uPositionOffset: [0.0, 0.0, 0.0], // Use array format for vec3 uniform
+    uPositionOffset: vec3(0.0, 0.0, 0.0),
     uResolution: vec(rt.screen.width, rt.screen.height),
     uSpeed: 0.5,
     uTime: clock.value / 1000, // convert to seconds
