@@ -12,7 +12,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 
 import { useShader } from '@hooks/useShader';
 import type { ShaderModule } from '@shaders/modules';
-import { vec3 } from '@helpers/skia/vec3';
+import { vec3 } from '@helpers/skia';
 
 import styles from './Torus.styles';
 
