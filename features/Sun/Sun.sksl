@@ -41,7 +41,7 @@ vec4 main(vec2 pxCoord)
   float time = uTime * 0.1;
 
   // Radius in normalized Y units
-  float radius = 0.3;
+  float radius = 0.5;
   float brightness = 0.2;
   // radius += brightness * 0.2;
 
@@ -54,6 +54,8 @@ vec4 main(vec2 pxCoord)
 
   // Distance from the center
   float dist = length(pos);
+
+  // Center disk edge mask: 0.0 inside radius, 1.0 outside
   float mask = step(radius, dist);
 
   // Scaled position relative to the radius
@@ -79,7 +81,7 @@ vec4 main(vec2 pxCoord)
   float fVal1 = 1.0 - fade;
   float fVal2 = 1.0 - fade;
 
-  float angle = atan(pos.x, pos.y) / (2 * PI);
+  float angle = atan(sp.x, sp.y) / (2 * PI);
   vec3 coord = vec3( angle, dist * radius, time * 0.1 );
 
   float newTime1 = abs( snoise( coord + vec3( 0.0, -time * ( 0.35 + brightness * 0.001 ), time * 0.015 ), 15.0 ) );
