@@ -40,21 +40,24 @@ vec4 main(vec2 pxCoord)
   vec2 uv = pxCoord / uResolution;
   float time = uTime * 0.1;
 
-  float brightness = 0.2;
+  // Radius in normalized Y units
   float radius = 0.3;
+  float brightness = 0.2;
   // radius += brightness * 0.2;
 
-  // Position
-  vec2 p = -1.0 + 2.0 * uv; // [-1.0, 1.0]
-  p += vec2(0.0, 0.0);;
-  p.x *= aspect;
+  // Position in normalized space [-1, 1], origin at center
+  vec2 pos = uv * 2.0 - 1.0;
+  pos.x *= aspect; // correct for aspect ratio distortion
+  float aspectOffset = (aspect - 1.0) * 0.5;
+  pos.y += aspectOffset; // offset vertical lift from aspect correction
+  pos += vec2(0.0, 0.0); // custom offset
 
   // Distance from the center
-  float dist = length(p);
+  float dist = length(pos);
   float mask = step(radius, dist);
 
   // Scaled position relative to the radius
-  vec2 sp = p * (1.0 / radius);
+  vec2 sp = pos / radius;
 
   // Squared magnitude of the scaled position
   float r = dot(sp,sp); // [0.0, 1.0]
@@ -76,7 +79,7 @@ vec4 main(vec2 pxCoord)
   float fVal1 = 1.0 - fade;
   float fVal2 = 1.0 - fade;
 
-  float angle = atan(p.x, p.y) / (2 * PI);
+  float angle = atan(pos.x, pos.y) / (2 * PI);
   vec3 coord = vec3( angle, dist * radius, time * 0.1 );
 
   float newTime1 = abs( snoise( coord + vec3( 0.0, -time * ( 0.35 + brightness * 0.001 ), time * 0.015 ), 15.0 ) );
