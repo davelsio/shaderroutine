@@ -69,9 +69,10 @@ vec4 main(vec2 pxCoord)
    * Halo
    */
   vec3 starHalo = vec3(1.0);
-  float f = (1.0 - sqrt(abs(1.0 - r))) / r;
-  f += brightness * 0.5;
-  starHalo *= f * ( 0.75 + brightness * 0.3 );
+  float ring = 1.0 - sqrt(abs(1.0 - r));
+  ring /= r; // inner glow
+  ring += 0.15 * pow(brightness, 2.0) + 0.375 * brightness; // apply brightness
+  starHalo *= ring;
 
 
   /**
@@ -110,7 +111,7 @@ vec4 main(vec2 pxCoord)
    */
   vec3 starTexture = vec3(0.0);
 
-  vec2 texUv = (sp * f) + vec2(time, 0.0);
+  vec2 texUv = (sp * ring) + vec2(time, 0.0);
   vec2 texCoord = texUv * uResolution;
   vec3 texSample = diffuse.eval(texCoord).xyz;
   float texOffset = texSample.y * brightness * 4.5 + time;
@@ -143,6 +144,7 @@ vec4 main(vec2 pxCoord)
 
   // color = vec3(p, 1.0);
   // color = vec3(r);
+  color = vec3(ring);
   // color = vec3(fade);
 
   // color = vec3(uv, 1.0);
