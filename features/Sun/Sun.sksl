@@ -123,7 +123,7 @@ vec4 main(vec2 pxCoord)
   /**
    * Glow
    */
-  float starGlow = min( max( 1.0 - dist * ( 1.0 - brightness ), 0.0 ), 1.0 );
+  float starGlow = clamp(1.0 - dist * ( 1.0 - brightness ), 0.0, 1.0);
   float glowRadius = smoothstep(-0.25, 1.0, starGlow);
   starGlow *= glowRadius;
 
