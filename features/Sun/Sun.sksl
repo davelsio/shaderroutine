@@ -41,7 +41,7 @@ vec4 main(vec2 pxCoord)
   float time = uTime * 0.1;
 
   // Radius in normalized Y units
-  float radius = 0.5;
+  float radius = 0.35;
   float brightness = 0.2;
   // radius += brightness * 0.2;
 
@@ -144,7 +144,7 @@ vec4 main(vec2 pxCoord)
 
   // color = vec3(p, 1.0);
   // color = vec3(r);
-  color = vec3(ring);
+  // color = vec3(ring);
   // color = vec3(fade);
 
   // color = vec3(uv, 1.0);
