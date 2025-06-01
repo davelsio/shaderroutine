@@ -48,8 +48,7 @@ vec4 main(vec2 pxCoord)
   // Position in normalized space [-1, 1], origin at center
   vec2 pos = uv * 2.0 - 1.0;
   pos.x *= aspect; // correct for aspect ratio distortion
-  float aspectOffset = (aspect - 1.0) * 0.5;
-  pos.y += aspectOffset; // offset vertical lift from aspect correction
+  pos.y += (aspect - 1.0) * 0.5; // offset vertical lift from aspect correction
   pos += vec2(0.0, 0.0); // custom offset
 
   // Distance from the center
