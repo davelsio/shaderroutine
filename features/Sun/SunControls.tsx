@@ -4,79 +4,134 @@ import ColorPicker, {
   HueSlider,
   Preview,
 } from 'reanimated-color-picker';
-import { Skia } from '@shopify/react-native-skia';
-import { runOnJS } from 'react-native-reanimated';
-import { useCallback, useState } from 'react';
+import {
+  interpolateColor,
+  runOnJS,
+  useAnimatedReaction,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { useCallback, useRef, useState } from 'react';
 import { Picker, type PickerProps } from '@expo/ui/swift-ui';
 
 import { Text } from '@typography/Text';
-import { colorToHex } from '@helpers/skia/convertColor';
 
 import styles from './Sun.styles';
 import { useSunState } from './SunState';
 
 const PRESETS = ['Sun', 'Neutron', 'Dwarf', 'Custom'];
 
+type PresetEvent = Parameters<NonNullable<PickerProps['onOptionSelected']>>[0];
+type CustomColors = { corona?: string; glow?: string };
+
+interface PresetParams extends PresetEvent {
+  picker?: CustomColors;
+}
+
 export function SunControlsView() {
   const state = useSunState();
-  const [preset, setPreset] = useState(0);
-  const [corona, setCorona] = useState(() => colorToHex(state.corona));
-  const [glow, setGlow] = useState(() => colorToHex(state.glow));
+
+  const [preset, setPreset] = useState(() => state.preset.get().index);
+  const customRef = useRef<{ corona: string; glow: string }>({
+    corona: '#6d4ccc',
+    glow: '#cc197b',
+  });
+  const [corona, setCorona] = useState(() => state.preset.get().corona);
+  const [glow, setGlow] = useState(() => state.preset.get().glow);
+
+  const colorTransition = useSharedValue(0);
+
+  useAnimatedReaction(
+    () => colorTransition.value,
+    (curr) => {
+      const _corona = interpolateColor(
+        curr,
+        [0, 1],
+        [state.preset.value.corona, corona]
+      );
+
+      const _glow = interpolateColor(
+        curr,
+        [0, 1],
+        [state.preset.value.glow, glow]
+      );
+
+      state.preset.value = {
+        index: preset,
+        corona: _corona,
+        glow: _glow,
+      };
+    }
+  );
 
   const updatePreset = useCallback(
-    ({
-      nativeEvent: { index, label },
-    }: Parameters<NonNullable<PickerProps['onOptionSelected']>>[0]) => {
-      let corona = state.corona.get();
-      let glow = state.glow.get();
+    ({ nativeEvent, picker }: PresetParams) => {
+      let { corona, glow } = state.preset.get();
+      const custom = customRef.current;
 
-      switch (label) {
+      switch (nativeEvent.label) {
         case 'Sun':
-          corona = Skia.Color('#cca54c');
-          glow = Skia.Color('#cc5919');
+          corona = '#cca54c';
+          glow = '#cc5919';
           break;
         case 'Neutron':
-          corona = Skia.Color('#4c5acc');
-          glow = Skia.Color('#1963cc');
+          corona = '#4c5acc';
+          glow = '#1963cc';
           break;
         case 'Dwarf':
-          corona = Skia.Color('#cc4c6a');
-          glow = Skia.Color('#cc1919');
+          corona = '#cc4c6a';
+          glow = '#cc1919';
           break;
         case 'Custom':
+          customRef.current = {
+            corona: picker?.corona ?? custom.corona,
+            glow: picker?.glow ?? custom.glow,
+          };
+          corona = customRef.current.corona;
+          glow = customRef.current.glow;
           break;
       }
 
-      state.corona.value = corona;
-      state.glow.value = glow;
+      if (picker) {
+        colorTransition.value = 1;
+      } else {
+        colorTransition.value = 0;
+        colorTransition.value = withTiming(1, { duration: 300 });
+      }
 
-      setCorona(colorToHex(corona));
-      setGlow(colorToHex(glow));
-      setPreset(index);
+      setCorona(corona);
+      setGlow(glow);
+      setPreset(nativeEvent.index);
     },
-    [state.corona, state.glow, setPreset]
+    [colorTransition, state.preset]
   );
 
   const onCoronaPickerUpdate = useCallback(
     (color: ColorFormatsObject, finished: boolean) => {
       'worklet';
-      state.corona.value = Skia.Color(color.hex);
+      state.preset.value.corona = color.hex;
       if (finished) {
-        runOnJS(updatePreset)({ nativeEvent: { index: 3, label: 'Custom' } });
+        runOnJS(updatePreset)({
+          nativeEvent: { index: 3, label: 'Custom' },
+          picker: { corona: color.hex, glow: state.preset.value.glow },
+        });
       }
     },
-    [state.corona, updatePreset]
+    [state.preset, updatePreset]
   );
 
   const onGlowPickerUpdate = useCallback(
     (color: ColorFormatsObject, finished: boolean) => {
       'worklet';
-      state.glow.value = Skia.Color(color.hex);
+      state.preset.value.glow = color.hex;
       if (finished) {
-        runOnJS(updatePreset)({ nativeEvent: { index: 3, label: 'Custom' } });
+        runOnJS(updatePreset)({
+          nativeEvent: { index: 3, label: 'Custom' },
+          picker: { corona: state.preset.value.corona, glow: color.hex },
+        });
       }
     },
-    [state.glow, updatePreset]
+    [state.preset, updatePreset]
   );
 
   return (

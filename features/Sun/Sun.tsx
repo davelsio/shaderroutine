@@ -31,8 +31,8 @@ export function SunView() {
   const time = useClock();
 
   const uniforms = useDerivedValue(() => ({
-    uCorona: state.corona.value,
-    uGlow: state.glow.value,
+    uCorona: Skia.Color(state.preset.value.corona),
+    uGlow: Skia.Color(state.preset.value.glow),
     uResolution: vec(state.width.value, state.height.value),
     uTime: time.value / 1000,
   }));

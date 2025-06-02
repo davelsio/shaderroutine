@@ -1,4 +1,3 @@
-import { type SkColor, Skia } from '@shopify/react-native-skia';
 import { createContext, PropsWithChildren, use, useMemo } from 'react';
 import {
   type SharedValue,
@@ -7,19 +6,23 @@ import {
 } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
 
+export const PRESETS = ['Sun', 'Neutron', 'Dwarf', 'Custom'] as const;
+
+type Preset = {
+  index: number;
+  corona: string;
+  glow: string;
+};
+
 type State = {
-  /**
-   * Corona and halo color.
-   */
-  corona: SharedValue<SkColor>;
-  /**
-   * Glow color.
-   */
-  glow: SharedValue<SkColor>;
   /**
    * Viewport height.
    */
   height: SharedValue<number>;
+  /**
+   * Preset.
+   */
+  preset: SharedValue<Preset>;
   /**
    * Viewport width.
    */
@@ -31,20 +34,22 @@ const SunContext = createContext<State | null>(null);
 export function SunProvider({ children }: PropsWithChildren) {
   const { rt } = useUnistyles();
 
-  const corona = useSharedValue(Skia.Color('#cca54c'));
-  const glow = useSharedValue(Skia.Color('#cc5919'));
+  const preset = useSharedValue<Preset>({
+    index: 0,
+    corona: '#cca54c',
+    glow: '#cc5919',
+  });
 
   const width = useDerivedValue(() => rt.screen.width);
   const height = useDerivedValue(() => rt.screen.height);
 
   const memoState = useMemo<State>(
     () => ({
-      corona,
-      glow,
       height,
+      preset,
       width,
     }),
-    [width, height, corona, glow]
+    [width, height, preset]
   );
 
   return <SunContext value={memoState}>{children}</SunContext>;
