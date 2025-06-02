@@ -12,6 +12,7 @@ export default function SunLayout() {
           options={{
             animation: 'slide_from_bottom',
             gestureDirection: 'vertical',
+            // gestureEnabled: false,
             presentation: 'formSheet',
             sheetLargestUndimmedDetentIndex: 0,
             sheetGrabberVisible: false,

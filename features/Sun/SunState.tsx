@@ -1,9 +1,5 @@
 import { createContext, PropsWithChildren, use, useMemo } from 'react';
-import {
-  type SharedValue,
-  useDerivedValue,
-  useSharedValue,
-} from 'react-native-reanimated';
+import { type SharedValue, useSharedValue } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
 
 export const PRESETS = ['Sun', 'Neutron', 'Dwarf', 'Custom'] as const;
@@ -40,8 +36,8 @@ export function SunProvider({ children }: PropsWithChildren) {
     glow: '#cc5919',
   });
 
-  const width = useDerivedValue(() => rt.screen.width);
-  const height = useDerivedValue(() => rt.screen.height);
+  const width = useSharedValue(rt.screen.width);
+  const height = useSharedValue(rt.screen.height);
 
   const memoState = useMemo<State>(
     () => ({

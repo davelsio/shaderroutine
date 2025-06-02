@@ -9,9 +9,10 @@ import {
   vec,
 } from '@shopify/react-native-skia';
 import { useMemo } from 'react';
-import { runOnJS, useDerivedValue } from 'react-native-reanimated';
+import { runOnJS, useDerivedValue, withSpring } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { router, usePathname } from 'expo-router';
+import { useUnistyles } from 'react-native-unistyles';
 
 import { useShader } from '@hooks/useShader';
 import { remap } from '@shaders/remap';
@@ -29,6 +30,7 @@ export function SunView() {
   const pathname = usePathname();
   const state = useSunState();
   const time = useClock();
+  const { rt } = useUnistyles();
 
   const uniforms = useDerivedValue(() => ({
     uCorona: Skia.Color(state.preset.value.corona),
@@ -51,8 +53,16 @@ export function SunView() {
 
   const gesture = Gesture.Tap().onStart(() => {
     if (pathname === '/sun') {
+      state.height.value = withSpring(rt.screen.height / 1.3, {
+        damping: 20,
+        stiffness: 200,
+      });
       runOnJS(router.navigate)('/sun/controls');
     } else {
+      state.height.value = withSpring(rt.screen.height, {
+        damping: 20,
+        stiffness: 200,
+      });
       runOnJS(router.dismissAll)();
     }
   });
