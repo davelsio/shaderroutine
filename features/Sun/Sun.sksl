@@ -98,7 +98,7 @@ vec4 main(vec2 pxCoord)
   float corona = pow( fVal1 * max( 1.1 - fade * 1.2, 0.0 ), 2.0 ) * factor;
   corona += pow( fVal2 * max( 1.1 - fade * 1.2, 0.0 ), 2.0 ) * factor;
 
-  // Variations on the corona effect (use one or combine them)
+  // Outer corona tendris (use one, none, or both)
   corona -= newTime1 * 0.3;
   // corona -= newTime2 * 0.2;
 
@@ -131,7 +131,8 @@ vec4 main(vec2 pxCoord)
    * Selectively un-comment the color lines below to debug the individual components.
    */
   vec3 color = starTexture
-               + (starHalo + corona) * uCorona.rgb
+               + starHalo * uCorona.rgb
+               + corona * uCorona.rgb
                + starGlow * uGlow.rgb;
 
   // color = starHalo;
@@ -140,12 +141,12 @@ vec4 main(vec2 pxCoord)
   // color = vec3(glowRadius);
   // color = vec3(corona);
 
-  // color = vec3(p, 1.0);
+  // color = vec3(pos, 1.0);
+  // color = vec3(pos.y);
   // color = vec3(r);
   // color = vec3(ring);
   // color = vec3(fade);
 
-  // color = vec3(pos.y);
   // color = vec3(uv, 1.0);
   return vec4(color, 1.0);
 }

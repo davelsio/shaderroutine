@@ -12,6 +12,7 @@ const styles = StyleSheet.create((theme, rt) => ({
   controls: {
     flex: 1,
     padding: 20,
+    paddingBottom: 40,
     gap: 20,
   },
   picker: {
@@ -19,6 +20,7 @@ const styles = StyleSheet.create((theme, rt) => ({
   },
   hueSlider: {
     flex: 1,
+    gap: 8,
   },
 }));
 

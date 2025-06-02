@@ -15,7 +15,7 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0
       '@expo/ui':
-        specifier: 0.1.1-alpha.7
+        specifier: ~0.1.1-alpha.7
         version: 0.1.1-alpha.7(expo@53.0.9(@babel/core@7.27.1)(@expo/metro-runtime@5.0.4(react-native@0.79.2(@babel/core@7.27.1)(@react-native-community/cli@13.6.8)(@types/react@19.0.14)(react@19.0.0)))(graphql@15.8.0)(react-native@0.79.2(@babel/core@7.27.1)(@react-native-community/cli@13.6.8)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.1)(@react-native-community/cli@13.6.8)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
       '@hookform/resolvers':
         specifier: ^5.0.1

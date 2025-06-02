@@ -1,4 +1,4 @@
-import { SkColor, Skia } from '@shopify/react-native-skia';
+import { type SkColor, Skia } from '@shopify/react-native-skia';
 import { createContext, PropsWithChildren, use, useMemo } from 'react';
 import {
   type SharedValue,
