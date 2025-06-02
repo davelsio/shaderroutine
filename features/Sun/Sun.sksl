@@ -41,14 +41,13 @@ vec4 main(vec2 pxCoord)
   float time = uTime * 0.1;
 
   // Radius in normalized Y units
-  float radius = 0.35;
+  float radius = 0.25;
   float brightness = 0.2;
   // radius += brightness * 0.2;
 
   // Position in normalized space [-1, 1], origin at center
   vec2 pos = uv * 2.0 - 1.0;
   pos.x *= aspect; // correct for aspect ratio distortion
-  pos.y += (aspect - 1.0) * 0.5; // offset vertical lift from aspect correction
   pos += vec2(0.0, 0.0); // custom offset
 
   // Distance from the center
@@ -123,7 +122,7 @@ vec4 main(vec2 pxCoord)
    * Glow
    */
   float starGlow = clamp(1.0 - dist * ( 1.0 - brightness ), 0.0, 1.0);
-  float glowRadius = smoothstep(-0.25, 1.0, starGlow);
+  float glowRadius = smoothstep(-1.0, 1.0, starGlow);
   starGlow *= glowRadius;
 
   /**
@@ -146,6 +145,7 @@ vec4 main(vec2 pxCoord)
   // color = vec3(ring);
   // color = vec3(fade);
 
+  // color = vec3(pos.y);
   // color = vec3(uv, 1.0);
   return vec4(color, 1.0);
 }

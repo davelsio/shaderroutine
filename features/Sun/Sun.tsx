@@ -24,19 +24,17 @@ const sunSkShader: ShaderModule = {
 };
 
 export function SunView() {
-  const { rt } = useUnistyles();
-
   const clock = useClock();
   const surface = useImage(require('@assets/textures/sun.png'));
+  const { rt } = useUnistyles();
+  const width = rt.screen.width;
+  const height = rt.screen.height;
 
   const { shader } = useShader(sunSkShader);
   const skShader = useMemo(
     () => (shader ? Skia.RuntimeEffect.Make(shader) : null),
     [shader]
   );
-
-  const width = rt.screen.width;
-  const height = rt.screen.height / 1.3;
 
   const uniforms = useDerivedValue(() => ({
     uResolution: vec(width, height),
