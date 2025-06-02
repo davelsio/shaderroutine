@@ -1,6 +1,10 @@
 // kind=shader
 
 uniform shader diffuse;
+
+uniform vec4 uCorona;
+uniform vec4 uGlow;
+
 uniform vec2 uResolution;
 uniform float uTime;
 
@@ -30,9 +34,6 @@ float snoise(vec3 uv, float res)
 }
 
 const float PI = 3.14159265359;
-
-vec3 orange = vec3( 0.8, 0.65, 0.3 );
-vec3 orangeRed = vec3( 0.8, 0.35, 0.1 );
 
 vec4 main(vec2 pxCoord)
 {
@@ -130,9 +131,8 @@ vec4 main(vec2 pxCoord)
    * Selectively un-comment the color lines below to debug the individual components.
    */
   vec3 color = starTexture
-               + starHalo * orange
-               + corona * orange
-               + starGlow * orangeRed;
+               + (starHalo + corona) * uCorona.rgb
+               + starGlow * uGlow.rgb;
 
   // color = starHalo;
   // color = starTexture;

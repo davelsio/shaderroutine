@@ -1,5 +1,5 @@
-import { SunView } from '@features/Sun';
+import { Redirect } from 'expo-router';
 
 export default function HomeScreen() {
-  return <SunView />;
+  return <Redirect href="/sun" />;
 }
