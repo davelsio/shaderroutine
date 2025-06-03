@@ -96,7 +96,7 @@ export function SunView() {
     };
 
     if (pathname === '/sun') {
-      state.height.value = withSpring(rt.screen.height / 1.3, springConfig);
+      state.height.value = withSpring(rt.screen.height / 2, springConfig);
       runOnJS(router.navigate)('/sun/controls');
     } else {
       state.height.value = withSpring(rt.screen.height, springConfig);

@@ -11,19 +11,10 @@ const styles = StyleSheet.create((theme, rt) => ({
   },
   controls: {
     flex: 1,
-    padding: 20,
-    paddingBottom: 40,
+    paddingHorizontal: 20,
+    paddingTop: 30,
+    paddingBottom: rt.insets.bottom + 20,
     gap: 30,
-  },
-  picker: {
-    gap: 10,
-  },
-  hueSlider: {
-    flex: 1,
-    gap: 12,
-  },
-  sliderPreview: {
-    width: '25%',
   },
 }));
 

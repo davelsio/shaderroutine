@@ -1,9 +1,8 @@
 import { View } from 'react-native';
-import ColorPicker, {
+import {
+  BrightnessSlider,
   type ColorFormatsObject,
   HueSlider,
-  OpacitySlider,
-  Preview,
   colorKit,
 } from 'reanimated-color-picker';
 import {
@@ -14,16 +13,10 @@ import {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import {
-  type PropsWithChildren,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Picker, type PickerProps } from '@expo/ui/swift-ui';
 
-import { Text } from '@typography/Text';
+import { InlinePicker } from '@components/InlinePicker';
 
 import styles from './Sun.styles';
 import {
@@ -150,15 +143,16 @@ export function SunControlsView() {
   const onBrightnessChange = useCallback(
     (color: ColorFormatsObject, finished: boolean) => {
       'worklet';
-      const match = color.rgba.match(/[\d.]+/g);
+      const match = color.hsv.match(/[\d.]+/g);
       if (!match) return;
-      state.preset.value.brightness = Number(match[match.length - 1]);
+      const opacity = Number(match[match.length - 1]) / 100;
+      state.preset.value.brightness = opacity;
       if (finished) {
         runOnJS(updatePreset)({
           nativeEvent: { index: 3, label: 'Custom' },
           custom: {
             ...state.preset.value,
-            brightness: state.preset.value.brightness,
+            brightness: opacity,
           },
         });
       }
@@ -167,8 +161,19 @@ export function SunControlsView() {
   );
 
   const bColor = useMemo(() => {
-    const mix = interpolateColor(0.5, [0, 1], [preset.corona, preset.glow]);
-    return colorKit.setAlpha(mix, preset.brightness).hex();
+    const mix = interpolateColor(
+      0.5,
+      [0, 1],
+      [preset.corona, preset.glow],
+      'HSV'
+    );
+
+    const hsv = colorKit
+      .setBrightness(mix, preset.brightness * 100)
+      .hsv()
+      .string();
+
+    return hsv;
   }, [preset]);
 
   return (
@@ -182,86 +187,32 @@ export function SunControlsView() {
       />
 
       {/* CORONA */}
-      <InlineSlider
+      <InlinePicker
         label="Corona"
         value={preset.corona}
         onUpdate={onCoronaPickerUpdate}
       >
         <HueSlider boundedThumb />
-      </InlineSlider>
+      </InlinePicker>
 
       {/* GLOW */}
-      <InlineSlider
+      <InlinePicker
         label="Glow"
         value={preset.glow}
         onUpdate={onGlowPickerUpdate}
       >
         <HueSlider boundedThumb />
-      </InlineSlider>
+      </InlinePicker>
 
       {/* BRIGHTNESS */}
-      <InlineSlider
+      <InlinePicker
         label="Brightness"
         value={bColor}
         onUpdate={onBrightnessChange}
         preview={false}
       >
-        <OpacitySlider boundedThumb />
-      </InlineSlider>
-    </View>
-  );
-}
-
-type InlineColorPickerProps = {
-  label: string;
-  value: string;
-  onUpdate: (color: ColorFormatsObject, finished: boolean) => void;
-  preview?: boolean;
-};
-
-function InlineSlider({
-  children,
-  label,
-  onUpdate,
-  preview = true,
-  value,
-}: PropsWithChildren<InlineColorPickerProps>) {
-  const updateValue = useCallback(
-    (colors: ColorFormatsObject) => {
-      'worklet';
-      onUpdate(colors, false);
-    },
-    [onUpdate]
-  );
-
-  const refreshValue = useCallback(
-    (color: ColorFormatsObject) => {
-      'worklet';
-      onUpdate(color, true);
-    },
-    [onUpdate]
-  );
-
-  return (
-    <View style={styles.picker}>
-      <ColorPicker
-        style={styles.hueSlider}
-        thumbSize={25}
-        value={value}
-        onChange={updateValue}
-        onComplete={refreshValue}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Text variant="headline">{label}</Text>
-          {preview && <Preview style={styles.sliderPreview} hideInitialColor />}
-        </View>
-        {children}
-      </ColorPicker>
+        <BrightnessSlider adaptSpectrum />
+      </InlinePicker>
     </View>
   );
 }
