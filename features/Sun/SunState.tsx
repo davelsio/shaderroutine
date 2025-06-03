@@ -86,8 +86,11 @@ export const DEFAULT_PRESETS: Record<PresetName, SunPreset> = {
   Custom: {
     index: 3,
     brightness: 0.5,
-    corona: '#6d4ccc',
-    glow: '#cc197b',
-    radius: 0.25,
+    // corona: '#6d4ccc',
+    // glow: '#cc197b',
+    // radius: 0.25,
+    corona: '#cc4c4c',
+    glow: '#19a2cc',
+    radius: 0.3,
   },
 };
