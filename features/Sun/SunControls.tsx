@@ -17,7 +17,7 @@ import { Picker, type PickerProps } from '@expo/ui/swift-ui';
 import { Text } from '@typography/Text';
 
 import styles from './Sun.styles';
-import { useSunState } from './SunState';
+import { type SunPreset, useSunState } from './SunState';
 
 const PRESETS = ['Sun', 'Neutron', 'Dwarf', 'Custom'];
 
@@ -31,35 +31,38 @@ interface PresetParams extends PresetEvent {
 export function SunControlsView() {
   const state = useSunState();
 
-  const [preset, setPreset] = useState(() => state.preset.get().index);
-  const customRef = useRef<{ corona: string; glow: string }>({
+  const [preset, setPreset] = useState<SunPreset>(() => state.preset.get());
+  const customRef = useRef<SunPreset>({
+    index: 3,
     corona: '#6d4ccc',
     glow: '#cc197b',
+    brightness: 0.2,
+    radius: 0.25,
   });
-  const [corona, setCorona] = useState(() => state.preset.get().corona);
-  const [glow, setGlow] = useState(() => state.preset.get().glow);
 
-  const colorTransition = useSharedValue(0);
+  const presetTransition = useSharedValue(0);
 
   useAnimatedReaction(
-    () => colorTransition.value,
+    () => presetTransition.value,
     (curr) => {
       const _corona = interpolateColor(
         curr,
         [0, 1],
-        [state.preset.value.corona, corona]
+        [state.preset.value.corona, preset.corona]
       );
 
       const _glow = interpolateColor(
         curr,
         [0, 1],
-        [state.preset.value.glow, glow]
+        [state.preset.value.glow, preset.glow]
       );
 
       state.preset.value = {
-        index: preset,
+        index: preset.index,
         corona: _corona,
         glow: _glow,
+        brightness: preset.brightness,
+        radius: preset.radius,
       };
     }
   );
@@ -84,26 +87,35 @@ export function SunControlsView() {
           break;
         case 'Custom':
           customRef.current = {
+            index: nativeEvent.index,
             corona: picker?.corona ?? custom.corona,
             glow: picker?.glow ?? custom.glow,
+            brightness: custom.brightness,
+            radius: custom.radius,
           };
           corona = customRef.current.corona;
           glow = customRef.current.glow;
           break;
       }
 
+      const nextPreset: SunPreset = {
+        index: nativeEvent.index,
+        corona,
+        glow,
+        radius: 0.25,
+        brightness: 0.2,
+      };
+
       if (picker) {
-        colorTransition.value = 1;
+        presetTransition.value = 1;
       } else {
-        colorTransition.value = 0;
-        colorTransition.value = withTiming(1, { duration: 300 });
+        presetTransition.value = 0;
+        presetTransition.value = withTiming(1, { duration: 300 });
       }
 
-      setCorona(corona);
-      setGlow(glow);
-      setPreset(nativeEvent.index);
+      setPreset(nextPreset);
     },
-    [colorTransition, state.preset]
+    [presetTransition, state.preset]
   );
 
   const onCoronaPickerUpdate = useCallback(
@@ -139,17 +151,17 @@ export function SunControlsView() {
       <Picker
         variant="segmented"
         options={PRESETS}
-        selectedIndex={preset}
+        selectedIndex={preset.index}
         onOptionSelected={updatePreset}
       />
       <InlineColorPicker
         label="Corona"
-        value={corona}
+        value={preset.corona}
         onUpdate={onCoronaPickerUpdate}
       />
       <InlineColorPicker
         label="Glow"
-        value={glow}
+        value={preset.glow}
         onUpdate={onGlowPickerUpdate}
       />
     </View>

@@ -2,8 +2,10 @@
 
 uniform shader diffuse;
 
+uniform float uBrightness;
 uniform vec4 uCorona;
 uniform vec4 uGlow;
+uniform float uRadius;
 
 uniform vec2 uResolution;
 uniform float uTime;
@@ -42,8 +44,8 @@ vec4 main(vec2 pxCoord)
   float time = uTime * 0.1;
 
   // Radius in normalized Y units
-  float radius = 0.25;
-  float brightness = 0.2;
+  float radius = uRadius;
+  float brightness = uBrightness;
   // radius += brightness * 0.2;
 
   // Position in normalized space [-1, 1], origin at center

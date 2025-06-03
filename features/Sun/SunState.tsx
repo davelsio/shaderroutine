@@ -4,10 +4,12 @@ import { useUnistyles } from 'react-native-unistyles';
 
 export const PRESETS = ['Sun', 'Neutron', 'Dwarf', 'Custom'] as const;
 
-type Preset = {
+export type SunPreset = {
   index: number;
+  brightness: number;
   corona: string;
   glow: string;
+  radius: number;
 };
 
 type State = {
@@ -18,7 +20,7 @@ type State = {
   /**
    * Preset.
    */
-  preset: SharedValue<Preset>;
+  preset: SharedValue<SunPreset>;
   /**
    * Viewport width.
    */
@@ -30,10 +32,12 @@ const SunContext = createContext<State | null>(null);
 export function SunProvider({ children }: PropsWithChildren) {
   const { rt } = useUnistyles();
 
-  const preset = useSharedValue<Preset>({
+  const preset = useSharedValue<SunPreset>({
     index: 0,
     corona: '#cca54c',
     glow: '#cc5919',
+    brightness: 0.2,
+    radius: 0.25,
   });
 
   const width = useSharedValue(rt.screen.width);

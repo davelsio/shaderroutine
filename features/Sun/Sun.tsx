@@ -33,8 +33,10 @@ export function SunView() {
   const { rt } = useUnistyles();
 
   const uniforms = useDerivedValue(() => ({
+    uBrightness: state.preset.value.brightness,
     uCorona: Skia.Color(state.preset.value.corona),
     uGlow: Skia.Color(state.preset.value.glow),
+    uRadius: state.preset.value.radius,
     uResolution: vec(state.width.value, state.height.value),
     uTime: time.value / 1000,
   }));
