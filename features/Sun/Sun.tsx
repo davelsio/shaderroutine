@@ -9,7 +9,12 @@ import {
   vec,
 } from '@shopify/react-native-skia';
 import { useMemo } from 'react';
-import { runOnJS, useDerivedValue, withSpring } from 'react-native-reanimated';
+import {
+  runOnJS,
+  useDerivedValue,
+  withSpring,
+  type WithSpringConfig,
+} from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { router, usePathname } from 'expo-router';
 import { useUnistyles } from 'react-native-unistyles';
@@ -54,17 +59,18 @@ export function SunView() {
   }
 
   const gesture = Gesture.Tap().onStart(() => {
+    const springConfig: WithSpringConfig = {
+      mass: 1,
+      damping: 26, // friction
+      stiffness: 170, // tension
+      velocity: 0,
+    };
+
     if (pathname === '/sun') {
-      state.height.value = withSpring(rt.screen.height / 1.3, {
-        damping: 20,
-        stiffness: 200,
-      });
+      state.height.value = withSpring(rt.screen.height / 1.3, springConfig);
       runOnJS(router.navigate)('/sun/controls');
     } else {
-      state.height.value = withSpring(rt.screen.height, {
-        damping: 20,
-        stiffness: 200,
-      });
+      state.height.value = withSpring(rt.screen.height, springConfig);
       runOnJS(router.dismissAll)();
     }
   });
