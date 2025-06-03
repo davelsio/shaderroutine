@@ -16,6 +16,7 @@ import {
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Picker, type PickerProps } from '@expo/ui/swift-ui';
 
+import { Slider } from '@components/Slider';
 import { InlinePicker } from '@components/InlinePicker';
 
 import styles from './Sun.styles';
@@ -176,6 +177,26 @@ export function SunControlsView() {
     return hsv;
   }, [preset]);
 
+  const onRadiusChange = useCallback(
+    (value: number, finished: boolean) => {
+      'worklet';
+      state.preset.value = {
+        ...state.preset.value,
+        radius: value,
+      };
+      if (finished) {
+        runOnJS(updatePreset)({
+          nativeEvent: { index: 3, label: 'Custom' },
+          custom: {
+            ...state.preset.value,
+            radius: value,
+          },
+        });
+      }
+    },
+    [state.preset, updatePreset]
+  );
+
   return (
     <View style={styles.controls}>
       {/* PRESETS */}
@@ -213,6 +234,9 @@ export function SunControlsView() {
       >
         <BrightnessSlider adaptSpectrum />
       </InlinePicker>
+
+      {/* RADIUS */}
+      <Slider value={preset.radius} onValueChange={onRadiusChange} />
     </View>
   );
 }

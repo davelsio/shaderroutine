@@ -37,6 +37,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@lodev09/react-native-true-sheet": "^2.0.5",
     "@radix-ui/colors": "^3.0.0",
+    "@react-native-community/slider": "^4.5.6",
     "@react-navigation/native": "^7.1.6",
     "@shopify/react-native-skia": "2.0.0-next.4",
     "expo": "~53.0.9",
@@ -62,7 +63,7 @@
     "react-native-nitro-modules": "^0.25.2",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "4.10.0",
+    "react-native-screens": "4.11.1",
     "react-native-svg": "^15.11.2",
     "react-native-unistyles": "3.0.0-rc.2",
     "react-native-web": "~0.20.0",
@@ -83,5 +84,5 @@
     "react-test-renderer": "19.1.0",
     "typescript": "~5.8.3"
   },
-  "packageManager": "pnpm@10.11.0"
+  "packageManager": "pnpm@10.11.1"
 }
