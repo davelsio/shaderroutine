@@ -3,7 +3,9 @@ import {
   Fill,
   ImageShader,
   Shader,
+  type SkColor,
   Skia,
+  type SkPoint,
   useClock,
   useImage,
   vec,
@@ -26,6 +28,33 @@ import type { ShaderModule } from '@shaders/modules';
 import styles from './Sun.styles';
 import { useSunState } from './SunState';
 
+type Uniforms = {
+  /**
+   * Sun brightness.
+   */
+  uBrightness: number;
+  /**
+   * Corona color.
+   */
+  uCorona: SkColor;
+  /**
+   * Glow color.
+   */
+  uGlow: SkColor;
+  /**
+   * Sun radius in normalized y-axis units.
+   */
+  uRadius: number;
+  /**
+   * Image resolution.
+   */
+  uResolution: SkPoint;
+  /**
+   * Time in seconds.
+   */
+  uTime: number;
+};
+
 const sunSkShader: ShaderModule = {
   module: require('./Sun.sksl'),
   dependencies: [remap],
@@ -37,7 +66,7 @@ export function SunView() {
   const time = useClock();
   const { rt } = useUnistyles();
 
-  const uniforms = useDerivedValue(() => ({
+  const uniforms = useDerivedValue<Uniforms>(() => ({
     uBrightness: state.preset.value.brightness,
     uCorona: Skia.Color(state.preset.value.corona),
     uGlow: Skia.Color(state.preset.value.glow),

@@ -13,14 +13,17 @@ const styles = StyleSheet.create((theme, rt) => ({
     flex: 1,
     padding: 20,
     paddingBottom: 40,
-    gap: 20,
+    gap: 30,
   },
   picker: {
     gap: 10,
   },
   hueSlider: {
     flex: 1,
-    gap: 8,
+    gap: 12,
+  },
+  sliderPreview: {
+    width: '25%',
   },
 }));
 

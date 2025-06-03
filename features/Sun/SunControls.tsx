@@ -2,43 +2,48 @@ import { View } from 'react-native';
 import ColorPicker, {
   type ColorFormatsObject,
   HueSlider,
+  OpacitySlider,
   Preview,
+  colorKit,
 } from 'reanimated-color-picker';
 import {
+  interpolate,
   interpolateColor,
   runOnJS,
   useAnimatedReaction,
   useSharedValue,
-  withTiming,
+  withSpring,
 } from 'react-native-reanimated';
-import { useCallback, useRef, useState } from 'react';
+import {
+  type PropsWithChildren,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Picker, type PickerProps } from '@expo/ui/swift-ui';
 
 import { Text } from '@typography/Text';
 
 import styles from './Sun.styles';
-import { type SunPreset, useSunState } from './SunState';
-
-const PRESETS = ['Sun', 'Neutron', 'Dwarf', 'Custom'];
+import {
+  DEFAULT_PRESETS,
+  type PresetName,
+  type SunPreset,
+  useSunState,
+} from './SunState';
 
 type PresetEvent = Parameters<NonNullable<PickerProps['onOptionSelected']>>[0];
-type CustomColors = { corona?: string; glow?: string };
 
 interface PresetParams extends PresetEvent {
-  picker?: CustomColors;
+  custom?: SunPreset;
 }
 
 export function SunControlsView() {
   const state = useSunState();
 
   const [preset, setPreset] = useState<SunPreset>(() => state.preset.get());
-  const customRef = useRef<SunPreset>({
-    index: 3,
-    corona: '#6d4ccc',
-    glow: '#cc197b',
-    brightness: 0.2,
-    radius: 0.25,
-  });
+  const customRef = useRef<SunPreset>(DEFAULT_PRESETS.Custom);
 
   const presetTransition = useSharedValue(0);
 
@@ -57,65 +62,55 @@ export function SunControlsView() {
         [state.preset.value.glow, preset.glow]
       );
 
+      const _brightness = interpolate(
+        curr,
+        [0, 1],
+        [state.preset.value.brightness, preset.brightness]
+      );
+
+      const _radius = interpolate(
+        curr,
+        [0, 1],
+        [state.preset.value.radius, preset.radius]
+      );
+
       state.preset.value = {
         index: preset.index,
         corona: _corona,
         glow: _glow,
-        brightness: preset.brightness,
-        radius: preset.radius,
+        brightness: _brightness,
+        radius: _radius,
       };
     }
   );
 
   const updatePreset = useCallback(
-    ({ nativeEvent, picker }: PresetParams) => {
-      let { corona, glow } = state.preset.get();
-      const custom = customRef.current;
+    ({ nativeEvent, custom }: PresetParams) => {
+      let nextPreset = DEFAULT_PRESETS[nativeEvent.label as PresetName]!;
 
-      switch (nativeEvent.label) {
-        case 'Sun':
-          corona = '#cca54c';
-          glow = '#cc5919';
-          break;
-        case 'Neutron':
-          corona = '#4c5acc';
-          glow = '#1963cc';
-          break;
-        case 'Dwarf':
-          corona = '#cc4c6a';
-          glow = '#cc1919';
-          break;
-        case 'Custom':
-          customRef.current = {
-            index: nativeEvent.index,
-            corona: picker?.corona ?? custom.corona,
-            glow: picker?.glow ?? custom.glow,
-            brightness: custom.brightness,
-            radius: custom.radius,
-          };
-          corona = customRef.current.corona;
-          glow = customRef.current.glow;
-          break;
+      if (nativeEvent.label === 'Custom') {
+        const _custom = custom ?? customRef.current;
+        customRef.current = {
+          ..._custom,
+          index: nativeEvent.index,
+        };
+        nextPreset = customRef.current;
       }
 
-      const nextPreset: SunPreset = {
-        index: nativeEvent.index,
-        corona,
-        glow,
-        radius: 0.25,
-        brightness: 0.2,
-      };
-
-      if (picker) {
-        presetTransition.value = 1;
-      } else {
+      if (!custom) {
         presetTransition.value = 0;
-        presetTransition.value = withTiming(1, { duration: 300 });
+        // presetTransition.value = withTiming(1, { duration: 300 });
+        presetTransition.value = withSpring(1, {
+          mass: 1,
+          damping: 26,
+          stiffness: 170,
+          velocity: 0,
+        });
       }
 
       setPreset(nextPreset);
     },
-    [presetTransition, state.preset]
+    [presetTransition]
   );
 
   const onCoronaPickerUpdate = useCallback(
@@ -125,7 +120,10 @@ export function SunControlsView() {
       if (finished) {
         runOnJS(updatePreset)({
           nativeEvent: { index: 3, label: 'Custom' },
-          picker: { corona: color.hex, glow: state.preset.value.glow },
+          custom: {
+            ...state.preset.value,
+            corona: color.hex,
+          },
         });
       }
     },
@@ -139,31 +137,77 @@ export function SunControlsView() {
       if (finished) {
         runOnJS(updatePreset)({
           nativeEvent: { index: 3, label: 'Custom' },
-          picker: { corona: state.preset.value.corona, glow: color.hex },
+          custom: {
+            ...state.preset.value,
+            glow: color.hex,
+          },
         });
       }
     },
     [state.preset, updatePreset]
   );
 
+  const onBrightnessChange = useCallback(
+    (color: ColorFormatsObject, finished: boolean) => {
+      'worklet';
+      const match = color.rgba.match(/[\d.]+/g);
+      if (!match) return;
+      state.preset.value.brightness = Number(match[match.length - 1]);
+      if (finished) {
+        runOnJS(updatePreset)({
+          nativeEvent: { index: 3, label: 'Custom' },
+          custom: {
+            ...state.preset.value,
+            brightness: state.preset.value.brightness,
+          },
+        });
+      }
+    },
+    [state.preset, updatePreset]
+  );
+
+  const bColor = useMemo(() => {
+    const mix = interpolateColor(0.5, [0, 1], [preset.corona, preset.glow]);
+    return colorKit.setAlpha(mix, preset.brightness).hex();
+  }, [preset]);
+
   return (
     <View style={styles.controls}>
+      {/* PRESETS */}
       <Picker
         variant="segmented"
-        options={PRESETS}
+        options={Object.keys(DEFAULT_PRESETS)}
         selectedIndex={preset.index}
         onOptionSelected={updatePreset}
       />
-      <InlineColorPicker
+
+      {/* CORONA */}
+      <InlineSlider
         label="Corona"
         value={preset.corona}
         onUpdate={onCoronaPickerUpdate}
-      />
-      <InlineColorPicker
+      >
+        <HueSlider boundedThumb />
+      </InlineSlider>
+
+      {/* GLOW */}
+      <InlineSlider
         label="Glow"
         value={preset.glow}
         onUpdate={onGlowPickerUpdate}
-      />
+      >
+        <HueSlider boundedThumb />
+      </InlineSlider>
+
+      {/* BRIGHTNESS */}
+      <InlineSlider
+        label="Brightness"
+        value={bColor}
+        onUpdate={onBrightnessChange}
+        preview={false}
+      >
+        <OpacitySlider boundedThumb />
+      </InlineSlider>
     </View>
   );
 }
@@ -172,9 +216,16 @@ type InlineColorPickerProps = {
   label: string;
   value: string;
   onUpdate: (color: ColorFormatsObject, finished: boolean) => void;
+  preview?: boolean;
 };
 
-function InlineColorPicker({ label, onUpdate, value }: InlineColorPickerProps) {
+function InlineSlider({
+  children,
+  label,
+  onUpdate,
+  preview = true,
+  value,
+}: PropsWithChildren<InlineColorPickerProps>) {
   const updateValue = useCallback(
     (colors: ColorFormatsObject) => {
       'worklet';
@@ -193,7 +244,6 @@ function InlineColorPicker({ label, onUpdate, value }: InlineColorPickerProps) {
 
   return (
     <View style={styles.picker}>
-      <Text variant="headline">{label}</Text>
       <ColorPicker
         style={styles.hueSlider}
         thumbSize={25}
@@ -201,8 +251,16 @@ function InlineColorPicker({ label, onUpdate, value }: InlineColorPickerProps) {
         onChange={updateValue}
         onComplete={refreshValue}
       >
-        <Preview style={{ width: '25%' }} hideInitialColor />
-        <HueSlider />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Text variant="headline">{label}</Text>
+          {preview && <Preview style={styles.sliderPreview} hideInitialColor />}
+        </View>
+        {children}
       </ColorPicker>
     </View>
   );

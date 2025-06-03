@@ -40,13 +40,10 @@ const float PI = 3.14159265359;
 vec4 main(vec2 pxCoord)
 {
   float aspect = uResolution.x / uResolution.y;
-  vec2 uv = pxCoord / uResolution;
-  float time = uTime * 0.1;
-
-  // Radius in normalized Y units
-  float radius = uRadius;
   float brightness = uBrightness;
-  // radius += brightness * 0.2;
+  float radius = uRadius;
+  float time = uTime * 0.1;
+  vec2 uv = pxCoord / uResolution;
 
   // Position in normalized space [-1, 1], origin at center
   vec2 pos = uv * 2.0 - 1.0;
@@ -72,8 +69,8 @@ vec4 main(vec2 pxCoord)
   vec3 starHalo = vec3(1.0);
   float ring = 1.0 - sqrt(abs(1.0 - r));
   ring /= r; // inner glow
-  ring += 0.15 * pow(brightness, 2.0) + 0.375 * brightness; // apply brightness
-  starHalo *= ring;
+  float ringBrightness = 0.15 * pow(brightness, 2.0) + 0.375 * brightness; // apply brightness
+  starHalo *= ring + ringBrightness;
 
 
   /**
@@ -122,11 +119,11 @@ vec4 main(vec2 pxCoord)
 
 
   /**
-   * Glow
+   * Glow.
+   * Identity function from https://iquilezles.org/articles/functions/
    */
-  float starGlow = clamp(1.0 - dist * ( 1.0 - brightness ), 0.0, 1.0);
-  float glowRadius = smoothstep(-1.0, 1.0, starGlow);
-  starGlow *= glowRadius;
+  float glow = (1.0 - dist) * sqrt(brightness * brightness + 0.5 * 0.5);
+  glow = smoothstep(-0.1, 1.0, glow);
 
   /**
    * Final Color.
@@ -135,12 +132,11 @@ vec4 main(vec2 pxCoord)
   vec3 color = starTexture
                + starHalo * uCorona.rgb
                + corona * uCorona.rgb
-               + starGlow * uGlow.rgb;
+               + glow * uGlow.rgb;
 
   // color = starHalo;
   // color = starTexture;
-  // color = vec3(starGlow);
-  // color = vec3(glowRadius);
+  // color = vec3(glow);
   // color = vec3(corona);
 
   // color = vec3(pos, 1.0);
