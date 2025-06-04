@@ -12,7 +12,7 @@
 
 #### Sun
 
-[`./features/Sun/README.md`](./features/Sun/)
+[`./features/Sun/`](./features/Sun/)
 
 Skia adaptation of the [main sequence star](https://www.shadertoy.com/view/4dXGR4) shader in [Shadertoy](https://www.shadertoy.com/).
 
@@ -20,7 +20,7 @@ https://github.com/user-attachments/assets/24c7cfaa-baac-486f-a6dc-64f354e6737c
 
 #### Torus
 
-[`./features/Torus/README.md`](./features/Torus/)
+[`./features/Torus/`](./features/Torus/)
 
 Adaptation of [@baconbrix](https://x.com/baconbrix/status/1924919835420504339) torus example using Skia instead of Three.js.
 
