@@ -1,57 +1,21 @@
-import CommunitySlider, {
-  SliderProps as CommunitySliderProps,
+import RNSlider, {
+  type SliderProps as RNSliderProps,
 } from '@react-native-community/slider';
-import { useCallback } from 'react';
 import { View } from 'react-native';
 
 import { Text } from '@typography/Text';
 
 import styles from './Slider.styles';
 
-interface SliderProps
-  extends Omit<
-    CommunitySliderProps,
-    'onSlidingComplete' | 'onSlidingStart' | 'onValueChange'
-  > {
-  onValueChange: (value: number, finished: boolean) => void;
+interface SliderProps extends RNSliderProps {
+  label?: string;
 }
 
-export function Slider({ value, onValueChange, ...props }: SliderProps) {
-  const onUpdate = useCallback(
-    (value: number) => {
-      'worklet';
-      onValueChange(value, false);
-    },
-    [onValueChange]
-  );
-
-  const onComplete = useCallback(
-    (value: number) => {
-      'worklet';
-      onValueChange(value, true);
-    },
-    [onValueChange]
-  );
-
+export function Slider({ label, style, ...props }: SliderProps) {
   return (
-    <View style={styles.container}>
-      <Text variant="headline">Radius</Text>
-      <CommunitySlider
-        // Styles
-        style={styles.slider}
-        minimumTrackTintColor="#FFFFFF"
-        maximumTrackTintColor="#FFFFFF60"
-        // Behavior
-        lowerLimit={0.1}
-        minimumValue={0}
-        maximumValue={1}
-        tapToSeek
-        // Data
-        value={value}
-        onValueChange={onUpdate}
-        onSlidingComplete={onComplete}
-        {...props}
-      />
+    <View style={[styles.container, style]}>
+      {label && <Text variant="headline">{label}</Text>}
+      <RNSlider style={styles.slider} tapToSeek {...props} />
     </View>
   );
 }

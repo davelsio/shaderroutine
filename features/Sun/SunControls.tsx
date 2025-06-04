@@ -2,7 +2,6 @@ import { View } from 'react-native';
 import { interpolateColor, runOnJS } from 'react-native-reanimated';
 import { useCallback, useMemo, useState } from 'react';
 
-import { Slider } from '@components/Slider';
 import {
   BrightnessSlider,
   ColorFormatsObject,
@@ -11,6 +10,7 @@ import {
   HueSlider,
   PreviewLabel,
 } from '@components/ColorPicker';
+import { Slider } from '@components/Slider';
 
 import styles from './Sun.styles';
 import { type SunPreset, useSunState } from './SunState';
@@ -117,7 +117,21 @@ export function SunControlsView() {
         <BrightnessSlider adaptSpectrum />
       </ColorPicker>
 
-      <Slider value={preset.radius} onValueChange={onRadiusChange} />
+      <Slider
+        // Appearance
+        label="Radius"
+        minimumTrackTintColor="#FFFFFF"
+        maximumTrackTintColor="#FFFFFF60"
+        // Data
+        value={preset.radius}
+        onValueChange={onRadiusChange}
+        onSlidingComplete={refreshPreset}
+        // Behavior
+        lowerLimit={0.1}
+        upperLimit={1}
+        minimumValue={0}
+        maximumValue={1}
+      />
     </View>
   );
 }
