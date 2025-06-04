@@ -1,8 +1,21 @@
-import { createContext, PropsWithChildren, use, useMemo } from 'react';
-import { type SharedValue, useSharedValue } from 'react-native-reanimated';
+import {
+  createContext,
+  PropsWithChildren,
+  use,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {
+  interpolate,
+  interpolateColor,
+  type SharedValue,
+  useAnimatedReaction,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
-
-export const PRESETS = ['Sun', 'Neutron', 'Dwarf', 'Custom'] as const;
 
 export type SunPreset = {
   index: number;
@@ -14,38 +27,146 @@ export type SunPreset = {
 
 type State = {
   /**
-   * Viewport height.
+   * Whether a custom preset has been defined by the user.
+   */
+  hasCustom: boolean;
+  /**
+   * Shader viewport height. Note that this is different from the `Canvas`
+   * height.
    */
   height: SharedValue<number>;
   /**
-   * Preset.
+   * Currently selected preset.
    */
   preset: SharedValue<SunPreset>;
   /**
-   * Viewport width.
+   * Select a preset by its name. The `Custom` preset requires first to set its
+   * values using the `updateCustom` method.
+   * @param name preset name
+   */
+  selectPreset: (name: PresetName) => void;
+  /**
+   * Set or update the custom preset.
+   * @param preset custom preset values
+   */
+  updateCustom: (preset: SunPreset) => void;
+  /**
+   * Shader viewport width. Note that this is different from the `Canvas` width.
    */
   width: SharedValue<number>;
 };
 
-export type PresetName = (typeof PRESETS)[number];
+export type PresetName = keyof typeof DEFAULT_PRESETS | 'Custom';
 
 const SunContext = createContext<State | null>(null);
 
 export function SunProvider({ children }: PropsWithChildren) {
   const { rt } = useUnistyles();
 
-  const preset = useSharedValue<SunPreset>(DEFAULT_PRESETS.Sun);
+  const currPreset = useSharedValue<SunPreset>(DEFAULT_PRESETS.Sun);
+  const nexPreset = useSharedValue<SunPreset>(DEFAULT_PRESETS.Sun);
+  const customRef = useRef<SunPreset | undefined>(undefined);
+  const [hasCustom, setHasCustom] = useState(false);
 
   const width = useSharedValue(rt.screen.width);
   const height = useSharedValue(rt.screen.height);
 
+  const presetTransition = useSharedValue(0);
+
+  /**
+   * Animate preset selection.
+   */
+  useAnimatedReaction(
+    () => presetTransition.value,
+    (curr) => {
+      const _corona = interpolateColor(
+        curr,
+        [0, 1],
+        [currPreset.value.corona, nexPreset.value.corona]
+      );
+
+      const _glow = interpolateColor(
+        curr,
+        [0, 1],
+        [currPreset.value.glow, nexPreset.value.glow]
+      );
+
+      const _brightness = interpolate(
+        curr,
+        [0, 1],
+        [currPreset.value.brightness, nexPreset.value.brightness]
+      );
+
+      const _radius = interpolate(
+        curr,
+        [0, 1],
+        [currPreset.value.radius, nexPreset.value.radius]
+      );
+
+      currPreset.value = {
+        index: nexPreset.value.index,
+        corona: _corona,
+        glow: _glow,
+        brightness: _brightness,
+        radius: _radius,
+      };
+    }
+  );
+
+  /**
+   * Select a preset and trigger the transition animation.
+   */
+  const selectPreset = useCallback(
+    (name: PresetName) => {
+      presetTransition.value = 0;
+      let _nextPreset =
+        name === 'Custom' ? customRef.current : DEFAULT_PRESETS[name];
+
+      if (!_nextPreset) {
+        return;
+      }
+
+      // presetTransition.value = withTiming(1, { duration: 300 });
+      presetTransition.value = withSpring(1, {
+        mass: 1,
+        damping: 26,
+        stiffness: 170,
+        velocity: 0,
+      });
+
+      nexPreset.value = _nextPreset;
+    },
+    [nexPreset, presetTransition]
+  );
+
+  /**
+   * Update and select the custom preset.
+   */
+  const updateCustom = useCallback(
+    (preset: SunPreset) => {
+      customRef.current = {
+        ...preset,
+        index: Object.keys(DEFAULT_PRESETS).length,
+      };
+      setHasCustom(true);
+      selectPreset('Custom');
+    },
+    [selectPreset, setHasCustom]
+  );
+
+  /**
+   * Stable context state reference.
+   */
   const memoState = useMemo<State>(
     () => ({
+      hasCustom,
       height,
-      preset,
+      preset: currPreset,
+      updateCustom,
+      selectPreset,
       width,
     }),
-    [width, height, preset]
+    [hasCustom, height, currPreset, selectPreset, updateCustom, width]
   );
 
   return <SunContext value={memoState}>{children}</SunContext>;
@@ -59,9 +180,7 @@ export function useSunState() {
   return context;
 }
 
-export const PRESET_NAMES = ['Sun', 'Neutron', 'Dwarf', 'Custom'] as const;
-
-export const DEFAULT_PRESETS: Record<PresetName, SunPreset> = {
+export const DEFAULT_PRESETS = {
   Sun: {
     index: 0,
     brightness: 0.5,
@@ -83,12 +202,9 @@ export const DEFAULT_PRESETS: Record<PresetName, SunPreset> = {
     glow: '#cc1919',
     radius: 0.1,
   },
-  Custom: {
+  Retro: {
     index: 3,
     brightness: 0.5,
-    // corona: '#6d4ccc',
-    // glow: '#cc197b',
-    // radius: 0.25,
     corona: '#cc4c4c',
     glow: '#19a2cc',
     radius: 0.3,

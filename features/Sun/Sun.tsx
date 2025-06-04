@@ -11,22 +11,30 @@ import {
   vec,
 } from '@shopify/react-native-skia';
 import { useMemo } from 'react';
-import {
+import Animated, {
   runOnJS,
+  useAnimatedStyle,
   useDerivedValue,
+  useSharedValue,
   withSpring,
-  type WithSpringConfig,
+  withTiming,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { router, usePathname } from 'expo-router';
 import { useUnistyles } from 'react-native-unistyles';
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useShader } from '@hooks/useShader';
 import { remap } from '@shaders/remap';
 import type { ShaderModule } from '@shaders/modules';
+import springEasings from '@utils/springEasings';
 
 import styles from './Sun.styles';
-import { useSunState } from './SunState';
+import { DEFAULT_PRESETS, type PresetName, useSunState } from './SunState';
+
+const AnimatedSegmentedControl =
+  Animated.createAnimatedComponent(SegmentedControl);
 
 type Uniforms = {
   /**
@@ -66,6 +74,24 @@ export function SunView() {
   const time = useClock();
   const { rt } = useUnistyles();
 
+  const showPicker = useSharedValue(false);
+  const rControls = useAnimatedStyle(() => ({
+    opacity: showPicker.value
+      ? withTiming(1, { duration: 300 })
+      : withTiming(0, { duration: 200 }),
+    transform: [
+      {
+        scale: showPicker.value
+          ? withSpring(1, springEasings.easeOut)
+          : withSpring(0.75, springEasings.easeOut),
+      },
+    ],
+  }));
+
+  const selectedPreset = useDerivedValue<number | undefined>(
+    () => state.preset.value.index
+  );
+
   const uniforms = useDerivedValue<Uniforms>(() => ({
     uBrightness: state.preset.value.brightness,
     uCorona: Skia.Color(state.preset.value.corona),
@@ -83,43 +109,72 @@ export function SunView() {
     [shader]
   );
 
-  if (!skShader) {
-    return null;
-  }
+  const presetValues = useMemo(() => {
+    const keys = Object.keys(DEFAULT_PRESETS);
+    return state.hasCustom ? [...keys, 'Custom'] : keys;
+  }, [state.hasCustom]);
 
-  const gesture = Gesture.Tap().onStart(() => {
-    const springConfig: WithSpringConfig = {
-      mass: 1,
-      damping: 26, // friction
-      stiffness: 170, // tension
-      velocity: 0,
-    };
+  /**
+   * Show the custom controls view when long pressing on the main screen.
+   * Adjust the shader viewport height to make room for the controls.
+   */
+  const showControlsGesture = Gesture.LongPress().onStart(() => {
+    if (pathname !== '/sun') {
+      return;
+    }
+    state.height.value = withSpring(
+      rt.screen.height / 1.75,
+      springEasings.easeOut
+    );
+    runOnJS(router.navigate)('/sun/controls');
+  });
 
+  /**
+   * Hide/Show the segmented control when tapping on the main view.
+   * Ensure that it keeps a consistent state when the custom controls view is dismissed.
+   */
+  const togglePickerGesture = Gesture.Tap().onStart(() => {
     if (pathname === '/sun') {
-      state.height.value = withSpring(rt.screen.height / 2, springConfig);
-      runOnJS(router.navigate)('/sun/controls');
+      showPicker.value = !showPicker.value;
     } else {
-      state.height.value = withSpring(rt.screen.height, springConfig);
+      state.height.value = withSpring(rt.screen.height, springEasings.easeOut);
       runOnJS(router.dismissAll)();
     }
   });
 
+  const gesture = Gesture.Race(showControlsGesture, togglePickerGesture);
+
+  if (!skShader) {
+    return null;
+  }
+
   return (
-    <GestureDetector gesture={gesture}>
-      <Canvas style={styles.canvas}>
-        <Fill>
-          <Shader source={skShader} uniforms={uniforms}>
-            <ImageShader
-              image={surface}
-              fit="fill"
-              width={state.width}
-              height={state.height}
-              tx="repeat"
-              ty="repeat"
-            />
-          </Shader>
-        </Fill>
-      </Canvas>
-    </GestureDetector>
+    <SafeAreaView style={styles.safeArea}>
+      <GestureDetector gesture={gesture}>
+        <Canvas style={styles.canvas}>
+          <Fill>
+            <Shader source={skShader} uniforms={uniforms}>
+              <ImageShader
+                image={surface}
+                fit="fill"
+                width={state.width}
+                height={state.height}
+                tx="repeat"
+                ty="repeat"
+              />
+            </Shader>
+          </Fill>
+        </Canvas>
+      </GestureDetector>
+      <Animated.View style={[styles.picker, rControls]}>
+        <AnimatedSegmentedControl
+          values={presetValues}
+          selectedIndex={selectedPreset}
+          onChange={({ nativeEvent }) => {
+            state.selectPreset(nativeEvent.value as PresetName);
+          }}
+        />
+      </Animated.View>
+    </SafeAreaView>
   );
 }
