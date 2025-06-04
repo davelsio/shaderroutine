@@ -1,3 +1,6 @@
+import SegmentedControl, {
+  type NativeSegmentedControlIOSChangeEvent,
+} from '@react-native-segmented-control/segmented-control';
 import {
   Canvas,
   Fill,
@@ -10,7 +13,11 @@ import {
   useImage,
   vec,
 } from '@shopify/react-native-skia';
+import * as Haptics from 'expo-haptics';
+import { router, usePathname } from 'expo-router';
 import { useCallback, useMemo } from 'react';
+import type { NativeSyntheticEvent } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -19,19 +26,12 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { router, usePathname } from 'expo-router';
-import { useUnistyles } from 'react-native-unistyles';
-import SegmentedControl, {
-  type NativeSegmentedControlIOSChangeEvent,
-} from '@react-native-segmented-control/segmented-control';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
-import type { NativeSyntheticEvent } from 'react-native';
+import { useUnistyles } from 'react-native-unistyles';
 
 import { useShader } from '@hooks/useShader';
-import { remap } from '@shaders/remap';
 import type { ShaderModule } from '@shaders/modules';
+import { remap } from '@shaders/remap';
 import springEasings from '@utils/springEasings';
 
 import styles from './Sun.styles';

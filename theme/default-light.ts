@@ -1,5 +1,5 @@
-import { lightColors } from './vars/colors';
 import { baseTheme } from './base-theme';
+import { lightColors } from './vars/colors';
 
 const lightTokens = {
   accentBase: lightColors.purple1,

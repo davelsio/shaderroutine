@@ -6,10 +6,10 @@ import {
   useClock,
   vec,
 } from '@shopify/react-native-skia';
-import { useUnistyles } from 'react-native-unistyles';
 import { useMemo } from 'react';
-import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
+import { useUnistyles } from 'react-native-unistyles';
 
 import { useShader } from '@hooks/useShader';
 import type { ShaderModule } from '@shaders/modules';

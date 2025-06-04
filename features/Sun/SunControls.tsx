@@ -1,6 +1,6 @@
+import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { interpolateColor, runOnJS } from 'react-native-reanimated';
-import { useCallback, useMemo, useState } from 'react';
 
 import {
   BrightnessSlider,

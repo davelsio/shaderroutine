@@ -1,5 +1,5 @@
-import { darkColors } from './vars/colors';
 import { baseTheme } from './base-theme';
+import { darkColors } from './vars/colors';
 
 const darkTokens = {
   accentBase: darkColors.purple1,
