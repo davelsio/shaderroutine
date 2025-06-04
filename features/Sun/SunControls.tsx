@@ -1,15 +1,16 @@
 import { View } from 'react-native';
-import {
-  BrightnessSlider,
-  type ColorFormatsObject,
-  HueSlider,
-  colorKit,
-} from 'reanimated-color-picker';
 import { interpolateColor, runOnJS } from 'react-native-reanimated';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Slider } from '@components/Slider';
-import { ColorPicker, PreviewLabel } from '@components/InlinePicker';
+import {
+  BrightnessSlider,
+  ColorFormatsObject,
+  colorKit,
+  ColorPicker,
+  HueSlider,
+  PreviewLabel,
+} from '@components/ColorPicker';
 
 import styles from './Sun.styles';
 import { type SunPreset, useSunState } from './SunState';

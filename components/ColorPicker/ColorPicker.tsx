@@ -3,7 +3,7 @@ import ReanimatedColorPicker, {
   type ColorPickerProps as ReanimatedColorPickerProps,
 } from 'reanimated-color-picker';
 
-import styles from './InlinePicker.styles';
+import styles from './ColorPicker.styles';
 
 interface ColorPickerProps extends ReanimatedColorPickerProps {}
 

@@ -3,7 +3,7 @@ import { Preview } from 'reanimated-color-picker';
 
 import { Text } from '@typography/Text';
 
-import styles from './InlinePicker.styles';
+import styles from './ColorPicker.styles';
 
 type PreviewLabelProps = {
   label: string;
