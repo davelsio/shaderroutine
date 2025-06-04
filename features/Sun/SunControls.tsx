@@ -120,8 +120,6 @@ export function SunControlsView() {
       <Slider
         // Appearance
         label="Radius"
-        minimumTrackTintColor="#FFFFFF"
-        maximumTrackTintColor="#FFFFFF60"
         // Data
         value={preset.radius}
         onValueChange={onRadiusChange}
