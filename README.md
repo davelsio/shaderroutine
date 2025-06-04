@@ -16,9 +16,12 @@
 
 Skia adaptation of the [main sequence star](https://www.shadertoy.com/view/4dXGR4) shader in [Shadertoy](https://www.shadertoy.com/), reverse engineered and significantly modified to learn from it.
 
+https://github.com/user-attachments/assets/24c7cfaa-baac-486f-a6dc-64f354e6737c
 
 #### Torus
  Adaptation of [@baconbrix](https://x.com/baconbrix/status/1924919835420504339) torus example using Skia instead of Three.js.
+
+https://github.com/user-attachments/assets/b755a2de-0f02-4d15-b0ae-52c4ca5dcd7d
 
 [`./features/Torus/Torus.tsx`](./features/Torus/Torus.tsx)
 [`./features/Torus/Torus.sksl`](./features/Torus/Torus.sksl)
