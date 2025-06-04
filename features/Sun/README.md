@@ -4,7 +4,7 @@ Besides the Skia-specific changes, I've made several modifications to the origin
 
 - [x] Unified the fragment position and made it relative to the sphere radius, so all sun components scale and translate together.
 - [x] Removed the brightness diffuse in favor of a single control variable.
-- [x] Rewrote various component functions to have a more controlled falloff and simplify decomposition.
+- [x] Rewrote various functions to have a more controlled behavior and component decomposition.
 - [x] Added uniforms to control colors, brightness, radius, and various corona effects.
 
 I started wanting to learn how to create a 3D-looking structure from just a UV input, so I could reimplement it using Skia. Then I noticed several inconsistencies in the texture sampling and sun component transformations when trying to modify the scale or offset the position of the spheres, so I went ahead and fixed those too.
