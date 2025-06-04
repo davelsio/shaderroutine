@@ -13,15 +13,8 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useShader } from '@hooks/useShader';
 import type { ShaderModule } from '@shaders/modules';
-import { vec3 } from '@helpers/skia';
 
 import styles from './Torus.styles';
-
-export interface Vector3 {
-  x: number;
-  y: number;
-  z: number;
-}
 
 const torusSkShader: ShaderModule = {
   module: require('./Torus.sksl'),
@@ -41,10 +34,10 @@ export function TorusView() {
 
   const uniforms = useDerivedValue(() => ({
     uPaletteShift: 0.0,
-    uColorTint: vec3(6.0, 6.0, 6.0),
+    uColorTint: Skia.Color([6.0, 6.0, 6.0]),
     uDirection: -1.0,
     uSphereSize: 1.2,
-    uPositionOffset: vec3(0.0, 0.0, 0.0),
+    uPositionOffset: [0.0, 0.0, 0.0],
     uResolution: vec(rt.screen.width, rt.screen.height),
     uRotation: uRotation.value,
     uSpeed: 0.5,
