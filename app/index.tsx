@@ -1,5 +1,5 @@
-import { TorusView } from '@features/Torus';
+import { Redirect } from 'expo-router';
 
 export default function HomeScreen() {
-  return <TorusView />;
+  return <Redirect href="/sun" />;
 }

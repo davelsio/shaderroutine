@@ -26,6 +26,7 @@ const lightTokens = {
   grayBorderHover: lightColors.mauve8,
   graySolid: lightColors.mauve9,
   graySolidHover: lightColors.mauve10,
+  grayTextSubtle: lightColors.mauve11 + '60',
   grayText: lightColors.mauve11,
   grayTextContrast: lightColors.mauve12,
   //

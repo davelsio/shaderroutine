@@ -34,7 +34,10 @@
     "@expo-google-fonts/nunito": "^0.3.0",
     "@expo-google-fonts/space-mono": "^0.3.0",
     "@hookform/resolvers": "^5.0.1",
+    "@lodev09/react-native-true-sheet": "^2.0.5",
     "@radix-ui/colors": "^3.0.0",
+    "@react-native-community/slider": "^4.5.6",
+    "@react-native-segmented-control/segmented-control": "^2.5.7",
     "@react-navigation/native": "^7.1.6",
     "@shopify/react-native-skia": "2.0.0-next.4",
     "expo": "~53.0.9",
@@ -43,6 +46,7 @@
     "expo-dev-client": "~5.1.8",
     "expo-file-system": "~18.1.10",
     "expo-font": "~13.3.1",
+    "expo-haptics": "^14.1.4",
     "expo-image": "~2.1.7",
     "expo-linking": "~7.1.5",
     "expo-router": "5.0.7",
@@ -60,10 +64,11 @@
     "react-native-nitro-modules": "^0.25.2",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "4.10.0",
+    "react-native-screens": "4.11.1",
     "react-native-svg": "^15.11.2",
     "react-native-unistyles": "3.0.0-rc.2",
     "react-native-web": "~0.20.0",
+    "reanimated-color-picker": "^4.0.1",
     "zod": "^3.24.4"
   },
   "devDependencies": {
@@ -80,5 +85,5 @@
     "react-test-renderer": "19.1.0",
     "typescript": "~5.8.3"
   },
-  "packageManager": "pnpm@10.11.0"
+  "packageManager": "pnpm@10.11.1"
 }
