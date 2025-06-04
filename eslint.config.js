@@ -84,4 +84,11 @@ module.exports = defineConfig([
       },
     },
   },
+  // Allow `require` imports in JS files.
+  {
+    files: ['**/*.js'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
 ]);
