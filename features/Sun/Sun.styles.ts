@@ -18,6 +18,9 @@ const styles = StyleSheet.create((theme, rt) => ({
     right: 20,
     bottom: 40,
   },
+  segmentedControl: {
+    height: 40,
+  },
   controls: {
     flex: 1,
     paddingHorizontal: 20,

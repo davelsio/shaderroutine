@@ -10,7 +10,7 @@ import {
   useImage,
   vec,
 } from '@shopify/react-native-skia';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -22,8 +22,12 @@ import Animated, {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { router, usePathname } from 'expo-router';
 import { useUnistyles } from 'react-native-unistyles';
-import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import SegmentedControl, {
+  type NativeSegmentedControlIOSChangeEvent,
+} from '@react-native-segmented-control/segmented-control';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
+import type { NativeSyntheticEvent } from 'react-native';
 
 import { useShader } from '@hooks/useShader';
 import { remap } from '@shaders/remap';
@@ -122,6 +126,9 @@ export function SunView() {
     if (pathname !== '/sun') {
       return;
     }
+
+    runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+
     state.height.value = withSpring(
       rt.screen.height / 1.75,
       springEasings.easeOut
@@ -143,6 +150,15 @@ export function SunView() {
   });
 
   const gesture = Gesture.Race(showControlsGesture, togglePickerGesture);
+
+  const selectPreset = useCallback(
+    ({
+      nativeEvent,
+    }: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>) => {
+      state.selectPreset(nativeEvent.value as PresetName);
+    },
+    [state]
+  );
 
   if (!skShader) {
     return null;
@@ -168,11 +184,11 @@ export function SunView() {
       </GestureDetector>
       <Animated.View style={[styles.picker, rControls]}>
         <AnimatedSegmentedControl
+          appearance="dark"
+          style={styles.segmentedControl}
           values={presetValues}
           selectedIndex={selectedPreset}
-          onChange={({ nativeEvent }) => {
-            state.selectPreset(nativeEvent.value as PresetName);
-          }}
+          onChange={selectPreset}
         />
       </Animated.View>
     </SafeAreaView>
