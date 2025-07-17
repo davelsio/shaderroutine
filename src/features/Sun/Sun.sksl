@@ -1,0 +1,150 @@
+// kind=shader
+
+uniform shader diffuse;
+
+uniform float uBrightness;
+uniform vec4 uCorona;
+uniform vec4 uGlow;
+uniform float uRadius;
+
+uniform vec2 uResolution;
+uniform float uTime;
+
+float snoise(vec3 uv, float res)
+{
+  const vec3 s = vec3(1e0, 1e2, 1e4);
+
+  uv *= res;
+
+  vec3 uv0 = floor(mod(uv, res))*s;
+  vec3 uv1 = floor(mod(uv+vec3(1.), res))*s;
+
+  vec3 f = fract(uv); f = f*f*(3.0-2.0*f);
+
+  vec4 v = vec4(
+    uv0.x+uv0.y+uv0.z, uv1.x+uv0.y+uv0.z,
+    uv0.x+uv1.y+uv0.z, uv1.x+uv1.y+uv0.z
+  );
+
+  vec4 r = fract(sin(v*1e-3)*1e5);
+  float r0 = mix(mix(r.x, r.y, f.x), mix(r.z, r.w, f.x), f.y);
+
+  r = fract(sin((v + uv1.z - uv0.z)*1e-3)*1e5);
+  float r1 = mix(mix(r.x, r.y, f.x), mix(r.z, r.w, f.x), f.y);
+
+  return mix(r0, r1, f.z)*2.-1.;
+}
+
+const float PI = 3.14159265359;
+
+vec4 main(vec2 pxCoord)
+{
+  float aspect = uResolution.x / uResolution.y;
+  float brightness = uBrightness;
+  float radius = uRadius;
+  float time = uTime * 0.1;
+  vec2 uv = pxCoord / uResolution;
+
+  // Position in normalized space [-1, 1], origin at center
+  vec2 pos = uv * 2.0 - 1.0;
+  pos.x *= aspect; // correct for aspect ratio distortion
+  pos += vec2(0.0, 0.0); // custom offset
+
+  // Distance from the center
+  float dist = length(pos);
+
+  // Center disk edge mask: 0.0 inside radius, 1.0 outside
+  float mask = step(radius, dist);
+
+  // Scaled position relative to the radius
+  vec2 sp = pos / radius;
+
+  // Squared magnitude of the scaled position
+  float r = dot(sp,sp); // [0.0, 1.0]
+
+
+  /**
+   * Halo
+   */
+  vec3 starHalo = vec3(1.0);
+  float ring = 1.0 - sqrt(abs(1.0 - r));
+  ring /= r; // inner glow
+  float ringBrightness = 0.15 * pow(brightness, 2.0) + 0.375 * brightness; // apply brightness
+  starHalo *= ring + ringBrightness;
+
+
+  /**
+   * Corona
+   */
+  float fade = r * 0.25;
+  float fVal1 = 1.0 - fade;
+  float fVal2 = 1.0 - fade;
+
+  float angle = atan(sp.x, sp.y) / (2 * PI);
+  vec3 coord = vec3( angle, dist * radius, time * 0.1 );
+
+  float newTime1 = abs( snoise( coord + vec3( 0.0, -time * ( 0.35 + brightness * 0.001 ), time * 0.015 ), 15.0 ) );
+  float newTime2 = abs( snoise( coord + vec3( 0.0, -time * ( 0.15 + brightness * 0.001 ), time * 0.015 ), 45.0 ) );
+
+  const int ITER = 7;
+  for( int i=1; i<=ITER; i++ ){
+    float power = pow( 2.0, float(i + 1) );
+    fVal1 += ( 0.5 / power ) * snoise( coord + vec3( 0.0, -time, time * 0.2 ), ( power * ( 10.0 ) * ( newTime1 + 1.0 ) ) );
+    fVal2 += ( 0.5 / power ) * snoise( coord + vec3( 0.0, -time, time * 0.2 ), ( power * ( 25.0 ) * ( newTime2 + 1.0 ) ) );
+  }
+
+  float factor = 1.8;
+  float corona = pow( fVal1 * max( 1.1 - fade * 1.2, 0.0 ), 2.0 ) * factor;
+  corona += pow( fVal2 * max( 1.1 - fade * 1.2, 0.0 ), 2.0 ) * factor;
+
+  // Outer corona tendris (use one, none, or both)
+  corona -= newTime1 * 0.3;
+  // corona -= newTime2 * 0.2;
+
+ corona *= mask;
+
+
+  /**
+   * Texture
+   */
+  vec3 starTexture = vec3(0.0);
+
+  vec2 texUv = (sp * ring) + vec2(time, 0.0);
+  vec2 texCoord = texUv * uResolution;
+  vec3 texSample = diffuse.eval(texCoord).xyz;
+  float texOffset = texSample.y * brightness * 4.5 + time;
+
+  starTexture = diffuse.eval(texCoord + vec2(texOffset)).xyz;
+  starTexture *= 1.0 - mask;
+
+
+  /**
+   * Glow.
+   * Identity function from https://iquilezles.org/articles/functions/
+   */
+  float glow = (1.0 - dist) * sqrt(brightness * brightness + 0.5 * 0.5);
+  glow = smoothstep(-0.1, 1.0, glow);
+
+  /**
+   * Final Color.
+   * Selectively un-comment the color lines below to debug the individual components.
+   */
+  vec3 color = starTexture
+               + starHalo * uCorona.rgb
+               + corona * uCorona.rgb
+               + glow * uGlow.rgb;
+
+  // color = starHalo;
+  // color = starTexture;
+  // color = vec3(glow);
+  // color = vec3(corona);
+
+  // color = vec3(pos, 1.0);
+  // color = vec3(pos.y);
+  // color = vec3(r);
+  // color = vec3(ring);
+  // color = vec3(fade);
+
+  // color = vec3(uv, 1.0);
+  return vec4(color, 1.0);
+}

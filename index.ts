@@ -1,2 +1,2 @@
 import 'expo-router/entry';
-import './theme/themes';
+import './src/theme/themes';

@@ -1,3 +1,4 @@
+const typescriptEslint = require('@typescript-eslint/eslint-plugin');
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
 const globals = require('globals');
@@ -25,13 +26,21 @@ module.exports = defineConfig([
    * Custom project rules
    */
   {
+    plugins: {
+      '@typescript-eslint': typescriptEslint,
+    },
     rules: {
       // https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/order.md
       'import/order': [
         'warn',
         {
-          'newlines-between': 'always',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+          distinctGroup: true,
           groups: ['builtin', 'external', 'parent', 'sibling', 'index'],
+          'newlines-between': 'always',
           pathGroups: [
             {
               pattern: '@*/**',
@@ -39,7 +48,6 @@ module.exports = defineConfig([
               position: 'before',
             },
           ],
-          distinctGroup: true,
         },
       ],
 
@@ -49,13 +57,16 @@ module.exports = defineConfig([
       // Disable empty interface warnings in module augmentation
       '@typescript-eslint/no-empty-object-type': 'off',
 
+      // Allow sharing component and interface names
+      '@typescript-eslint/no-redeclare': 'off',
+
       // Extend Expo config to allow GLSL files
       // https://github.com/expo/expo/blob/main/packages/eslint-config-expo/utils/typescript.js#L59
       '@typescript-eslint/no-require-imports': [
         'warn',
         {
           allow: [
-            '\\.(aac|aiff|avif|bmp|caf|db|gif|glsl|heic|html|jpeg|jpg|json|m4a|m4v|mov|mp3|mp4|mpeg|mpg|otf|pdf|png|psd|svg|ttf|wav|webm|webp|xml|yaml|yml|zip)$',
+            '\\.(aac|aiff|avif|bmp|caf|db|gif|glsl|heic|html|jpeg|jpg|json|m4a|m4v|mov|mp3|mp4|mpeg|mpg|otf|pdf|png|psd|sksl|svg|ttf|wav|webm|webp|xml|yaml|yml|zip)$',
           ],
         },
       ],
@@ -71,6 +82,13 @@ module.exports = defineConfig([
       globals: {
         ...globals.jest,
       },
+    },
+  },
+  // Allow `require` imports in JS files.
+  {
+    files: ['**/*.js'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
     },
   },
 ]);

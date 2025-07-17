@@ -1,43 +1,27 @@
-<h1 align="center">Expo Stack</h1>
-<p align="center"><i>Simple Expo SDK53 starter</i></p>
+<h1 align="center">Shader Routine</h1>
+<p align="center"><i>Isolated experiments with shaders in React Native</i></p>
 
 ### Stack
 
-- Expo [SDK53](https://expo.dev/changelog/sdk-53-beta) with the new architecture enabled.
-- [Unistyles 3.0](https://www.unistyl.es/v3/start/introduction) as a drop-in replacement for the `StyleSheet` API.
-- [Radix UI](https://www.radix-ui.com/colors) to provide the base color palettes.
-- [React Hook Form](https://react-hook-form.com/) to compose form controllers.
-- [Zod](https://zod.dev/) for the validation of form schemas and API responses.
-- [ESlint 9](https://eslint.org/docs/latest/use/getting-started) configured with the new flat config.
+- [x] Expo [SDK53](https://expo.dev/changelog/sdk-53-beta) with the new architecture enabled.
+- [x] [Unistyles 3.0](https://www.unistyl.es/v3/start/introduction) as a drop-in replacement for the `StyleSheet` API.
+- [x] [React Native Skia](https://shopify.github.io/react-native-skia/) to render 2D and image-based shaders.
+- [ ] [Three.js]() together with [React Native WebGPU](https://github.com/wcandillon/react-native-webgpu) and [TypeGPU](https://docs.swmansion.com/TypeGPU/integration/react-native/) to render 3D scenes.
 
-## Examples
+## Features
 
-#### Google Fonts: Platform-based naming
-[`./theme/vars/fonts.ts`](./theme/vars/fonts.ts)
+#### Sun
 
-#### Google Fonts: Embedding with `expo-font`
-[`./app.config.ts`](./app.config.ts)
+[`./features/Sun/`](./features/Sun/)
 
-#### Google Fonts: Using custom and default faces
-[`./features/home/HomeView.tsx`](./features/home/HomeView.tsx)
+Skia adaptation of the [main sequence star](https://www.shadertoy.com/view/4dXGR4) shader in [Shadertoy](https://www.shadertoy.com/).
 
-## Commands
+https://github.com/user-attachments/assets/24c7cfaa-baac-486f-a6dc-64f354e6737c
 
-```bash
-pnpm run start                  # Start the development server
-pnpm run android                # Create an Android development build
-pnpm run ios                    # Create an iOS development build
-pnpm run android:build:preview  # EAS preview build for Android
-pnpm run android:build:prod     # EAS production build for Android
-pnpm run ios:build:preview      # EAS preview build for iOS
-pnpm run ios:build:prod         # EAS production build for iOS
-pnpm run eas:update:preview     # EAS update for preview
-pnpm run eas:update:prod        # EAS update for production
-pnpm run lint                   # Run ESLint and fix issues
-pnpm run format                 # Run Prettier and fix formatting issues
-pnpm run test                   # Run Jest tests
-pnpm run expo:check             # Check dependency versions
-pnpm run expo:doctor            # Check for issues with Expo Doctor
-pnpm run expo:install           # Install expo dependencies
-pnpm run expo:prebuild          # Prebuild the app
-```
+#### Torus
+
+[`./features/Torus/`](./features/Torus/)
+
+Adaptation of [@baconbrix](https://x.com/baconbrix/status/1924919835420504339) torus example using Skia instead of Three.js.
+
+https://github.com/user-attachments/assets/b755a2de-0f02-4d15-b0ae-52c4ca5dcd7d
