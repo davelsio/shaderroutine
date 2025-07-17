@@ -2,9 +2,9 @@ import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system';
 import { useEffect, useState } from 'react';
 
-import type { ShaderModule } from '@shaders/modules';
-import { resolveNodeDependencies } from '@utils/resolveNodeDependencies';
-import { withAbort } from '@utils/withAbort';
+import type { ShaderModule } from '../shaders/modules';
+import { resolveNodeDependencies } from '../utils/resolveNodeDependencies';
+import { withAbort } from '../utils/withAbort';
 
 const shaderCache = new Map<number, string>();
 

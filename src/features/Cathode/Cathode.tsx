@@ -12,9 +12,9 @@ import { useMemo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
 
-import { useShader } from '@hooks/useShader';
-import type { ShaderModule } from '@shaders/modules';
-import { remap } from '@shaders/remap';
+import { useShader } from '../../hooks/useShader';
+import type { ShaderModule } from '../../shaders/modules';
+import { remap } from '../../shaders/remap';
 
 import styles from './Cathode.styles';
 

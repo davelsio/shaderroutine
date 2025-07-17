@@ -2,7 +2,7 @@ import { Skia, type SkImage } from '@shopify/react-native-skia';
 import { Asset } from 'expo-asset';
 import { useEffect, useState } from 'react';
 
-import { withAbort } from '@utils/withAbort';
+import { withAbort } from '../utils/withAbort';
 
 const imageCache = new Map<string, SkImage>();
 

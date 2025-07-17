@@ -1,6 +1,11 @@
 /** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
 const unistylesOptions = {
-  autoProcessRoot: '.',
+  root: './src',
+  autoProcessImports: [
+    './src/components',
+    './src/features',
+    './src/typography',
+  ],
   debug: process.env.NODE_ENV === 'development',
 };
 

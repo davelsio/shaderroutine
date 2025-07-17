@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { Preview } from 'reanimated-color-picker';
 
-import { Text } from '@typography/Text';
+import { Text } from '../../typography/Text';
 
 import styles from './ColorPicker.styles';
 

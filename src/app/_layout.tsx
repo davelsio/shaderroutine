@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
-import { ThemeProvider } from '@theme/Provider';
+import { ThemeProvider } from '../theme/Provider';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // void SplashScreen.preventAutoHideAsync();

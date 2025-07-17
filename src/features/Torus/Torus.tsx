@@ -11,8 +11,8 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
 
-import { useShader } from '@hooks/useShader';
-import type { ShaderModule } from '@shaders/modules';
+import { useShader } from '../../hooks/useShader';
+import type { ShaderModule } from '../../shaders/modules';
 
 import styles from './Torus.styles';
 

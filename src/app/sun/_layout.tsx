@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-import { SunProvider } from '@features/Sun';
+import { SunProvider } from '../../features/Sun';
 
 export default function SunLayout() {
   return (

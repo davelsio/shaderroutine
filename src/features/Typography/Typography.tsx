@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Text } from '@typography/Text';
+import { Text } from '../../typography/Text';
 
 import styles from './Typography.styles';
 

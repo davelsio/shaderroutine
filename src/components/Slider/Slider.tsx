@@ -4,7 +4,7 @@ import RNSlider, {
 import { View } from 'react-native';
 import { withUnistyles } from 'react-native-unistyles';
 
-import { Text } from '@typography/Text';
+import { Text } from '../../typography/Text';
 
 import styles from './Slider.styles';
 

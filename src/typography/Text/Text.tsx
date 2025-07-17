@@ -1,7 +1,7 @@
 import type { ComponentPropsWithRef } from 'react';
 import { Text as RNText, type TextProps as RNTextProps } from 'react-native';
 
-import { FontFamily } from '@theme/vars/fonts';
+import { FontFamily } from '../../theme/vars/fonts';
 
 import styles, { type TextOptions, type TextVariants } from './Text.styles';
 

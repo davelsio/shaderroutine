@@ -9,8 +9,8 @@ import {
   ColorPicker,
   HueSlider,
   PreviewLabel,
-} from '@components/ColorPicker';
-import { Slider } from '@components/Slider';
+} from '../../components/ColorPicker';
+import { Slider } from '../../components/Slider';
 
 import styles from './Sun.styles';
 import { type SunPreset, useSunState } from './SunState';

@@ -29,10 +29,10 @@ import Animated, {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUnistyles } from 'react-native-unistyles';
 
-import { useShader } from '@hooks/useShader';
-import type { ShaderModule } from '@shaders/modules';
-import { remap } from '@shaders/remap';
-import springEasings from '@utils/springEasings';
+import { useShader } from '../../hooks/useShader';
+import type { ShaderModule } from '../../shaders/modules';
+import { remap } from '../../shaders/remap';
+import springEasings from '../../utils/springEasings';
 
 import styles from './Sun.styles';
 import { DEFAULT_PRESETS, type PresetName, useSunState } from './SunState';
