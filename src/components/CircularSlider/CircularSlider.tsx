@@ -1,4 +1,9 @@
-import { useCallback } from 'react';
+import {
+  type RefObject,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import type {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -14,6 +19,11 @@ type CircularSliderProps = {
   images: string[];
   onChange?: (currIndex: number, prevIndex: number) => void;
   onMomentumEnd?: (currIndex: number, prevIndex: number) => void;
+  ref?: RefObject<CircularSliderApi | null>;
+};
+
+export type CircularSliderApi = {
+  scrollToIndex: (props: { index: number; animated?: boolean }) => void;
 };
 
 const ITEM_TOTAL_SIZE = ITEM_SIZE + ITEM_SPACING;
@@ -22,15 +32,27 @@ export function CircularSlider({
   images,
   onChange,
   onMomentumEnd,
+  ref,
 }: CircularSliderProps) {
-  const scrollX = useSharedValue(0);
+  const sliderRef = useRef<FlatList<string> | null>(null);
+
+  const scrollIndex = useSharedValue(0);
   const prevIndex = useSharedValue(0);
   const activeIndex = useSharedValue(0);
 
+  useImperativeHandle(ref, () => ({
+    scrollToIndex: (props: { index: number; animated?: boolean }) => {
+      sliderRef.current?.scrollToOffset({
+        offset: props.index * ITEM_TOTAL_SIZE,
+        animated: true,
+      });
+    },
+  }));
+
   const onScrollMomentumEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      onMomentumEnd?.(activeIndex.value, prevIndex.value);
       prevIndex.value = activeIndex.value;
+      onMomentumEnd?.(activeIndex.value, prevIndex.value);
     },
     [activeIndex, onMomentumEnd, prevIndex]
   );
@@ -39,27 +61,32 @@ export function CircularSlider({
     ({
       nativeEvent: { contentOffset },
     }: NativeSyntheticEvent<NativeScrollEvent>) => {
-      scrollX.value = clamp(
+      scrollIndex.value = clamp(
         contentOffset.x / ITEM_TOTAL_SIZE,
         0,
         images.length - 1
       );
-      activeIndex.value = Math.round(scrollX.value);
+      activeIndex.value = Math.round(scrollIndex.value);
 
       onChange?.(activeIndex.value, prevIndex.value);
     },
-    [images, activeIndex, onChange, scrollX, prevIndex]
+    [images, activeIndex, onChange, scrollIndex, prevIndex]
   );
 
   const renderItem = useCallback<ListRenderItem<string>>(
     ({ item, index }) => (
-      <CircularSliderItem imageUri={item} index={index} scrollX={scrollX} />
+      <CircularSliderItem
+        imageUri={item}
+        index={index}
+        scrollIndex={scrollIndex}
+      />
     ),
-    [scrollX]
+    [scrollIndex]
   );
 
   return (
     <FlatList
+      ref={sliderRef}
       style={styles.carousel}
       contentContainerStyle={styles.carouselContainer}
       showsHorizontalScrollIndicator={false}

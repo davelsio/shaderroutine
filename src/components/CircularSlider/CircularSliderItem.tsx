@@ -12,13 +12,13 @@ import styles, { ITEM_SIZE } from './CircularSlider.styles';
 type CarouselItemProps = {
   imageUri: string;
   index: number;
-  scrollX: SharedValue<number>;
+  scrollIndex: SharedValue<number>;
 };
 
 export function CircularSliderItem({
   imageUri,
   index,
-  scrollX,
+  scrollIndex,
 }: CarouselItemProps) {
   const source = useMemo(() => ({ uri: imageUri }), [imageUri]);
 
@@ -26,14 +26,14 @@ export function CircularSliderItem({
     const translateDown = ITEM_SIZE / 3;
     return {
       borderColor: interpolateColor(
-        scrollX.value,
+        scrollIndex.value,
         [index - 1, index, index + 1],
         ['transparent', 'white', 'transparent']
       ),
       transform: [
         {
           translateY: interpolate(
-            scrollX.value,
+            scrollIndex.value,
             [index - 1, index, index + 1],
             [translateDown, 0, translateDown]
           ),

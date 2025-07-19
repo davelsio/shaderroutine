@@ -6,7 +6,7 @@ import {
   Skia,
   vec,
 } from '@shopify/react-native-skia';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import {
   Directions,
@@ -14,18 +14,21 @@ import {
   GestureDetector,
 } from 'react-native-gesture-handler';
 import {
+  runOnJS,
   useDerivedValue,
   useSharedValue,
   withSpring,
+  WithSpringConfig,
 } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
 
-import { CircularSlider } from '@components/CircularSlider';
+import { CircularSlider, CircularSliderApi } from '@components/CircularSlider';
 import { useImages } from '@hooks/useImages';
 import { useShader } from '@hooks/useShader';
 import { fbm } from '@shaders/fbm';
 import type { ShaderModule } from '@shaders/modules';
 import { sdfCircle } from '@shaders/sdfCircle';
+import { loopBackward, loopForward } from '@utils/loopValue';
 
 import styles from './Reveal.styles';
 
@@ -34,7 +37,23 @@ const revealSkShader: ShaderModule = {
   dependencies: [fbm, sdfCircle],
 };
 
+const flingSpring: WithSpringConfig = {
+  mass: 1,
+  damping: 26,
+  stiffness: 100,
+  velocity: 0,
+};
+
+const scrollSpring: WithSpringConfig = {
+  mass: 1,
+  damping: 26,
+  stiffness: 170,
+  velocity: 0,
+};
+
 export function Reveal() {
+  const sliderRef = useRef<CircularSliderApi>(null);
+
   const { rt } = useUnistyles();
   // const clock = useClock();
   const { error, loading, images } = useImages(imageURIs);
@@ -57,6 +76,16 @@ export function Reveal() {
     uProgress: progress.value,
   }));
 
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      sliderRef.current?.scrollToIndex({
+        index,
+        animated: true,
+      });
+    },
+    [sliderRef]
+  );
+
   const flingLeft = Gesture.Fling()
     .direction(Directions.LEFT) // forward
     .onStart(() => {
@@ -65,20 +94,18 @@ export function Reveal() {
       }
 
       animating.value = true;
-      index2.value = loopForward(index1.value);
+      index2.value = loopForward(index1.value, imageURIs.length);
       progress.value = 0.0;
-      progress.value = withSpring(
-        1,
-        { damping: 50, stiffness: 50 },
-        (finished) => {
-          if (finished) {
-            animating.value = false;
-            index1.value = loopForward(index1.value);
-            index2.value = loopForward(index1.value + 1);
-            progress.value = 0.0;
-          }
+      progress.value = withSpring(1, flingSpring, (finished) => {
+        if (finished) {
+          animating.value = false;
+          index1.value = loopForward(index1.value, imageURIs.length);
+          index2.value = loopForward(index1.value, imageURIs.length);
+          progress.value = 0.0;
         }
-      );
+      });
+
+      runOnJS(scrollToIndex)(index2.value);
     });
 
   const flingRight = Gesture.Fling()
@@ -90,19 +117,17 @@ export function Reveal() {
 
       animating.value = true;
       index2.value = index1.value;
-      index1.value = loopBackward(index2.value);
+      index1.value = loopBackward(index2.value, imageURIs.length);
       progress.value = 1.0;
 
-      progress.value = withSpring(
-        0,
-        { damping: 50, stiffness: 50 },
-        (finished) => {
-          if (finished) {
-            animating.value = false;
-            index2.value = loopForward(index1.value + 1);
-          }
+      progress.value = withSpring(0, flingSpring, (finished) => {
+        if (finished) {
+          animating.value = false;
+          index2.value = loopForward(index1.value, imageURIs.length);
         }
-      );
+      });
+
+      runOnJS(scrollToIndex)(index1.value);
     });
 
   const gesture = Gesture.Exclusive(flingLeft, flingRight);
@@ -113,6 +138,12 @@ export function Reveal() {
       if (currIndex === prevIndex) {
         return;
       }
+
+      if (animating.value) {
+        return;
+      }
+
+      animating.value = true;
 
       // Inverted directions, for consistency with the fling gesture
       const direction =
@@ -134,9 +165,16 @@ export function Reveal() {
         index2.value = prevIndex;
       }
 
-      progress.value = withSpring(toValue, { damping: 50, stiffness: 50 });
+      progress.value = withSpring(toValue, scrollSpring, (finished) => {
+        if (finished) {
+          index1.value = currIndex;
+          index2.value = loopForward(currIndex, imageURIs.length);
+          progress.value = 0.0;
+          animating.value = false;
+        }
+      });
     },
-    [index1, index2, progress]
+    [animating, index1, index2, progress]
   );
 
   const image1 = useDerivedValue(() => {
@@ -147,17 +185,9 @@ export function Reveal() {
     return images[index2.value] ?? null;
   });
 
-  if (error) {
-    return null;
-  }
-
-  if (loading) {
-    return null;
-  }
-
-  if (!skShader) {
-    return null;
-  }
+  if (error) return null;
+  if (loading) return null;
+  if (!skShader) return null;
 
   return (
     <GestureDetector gesture={gesture}>
@@ -180,7 +210,11 @@ export function Reveal() {
             </Shader>
           </Fill>
         </Canvas>
-        <CircularSlider images={imageURIs} onMomentumEnd={onCarouselChange} />
+        <CircularSlider
+          ref={sliderRef}
+          images={imageURIs}
+          onMomentumEnd={onCarouselChange}
+        />
       </View>
     </GestureDetector>
   );
@@ -195,13 +229,3 @@ const imageURIs = [
   'https://cdn.dribbble.com/users/3281732/screenshots/6727912/samji_illustrator.jpeg?compress=1&resize=800x800',
   'https://cdn.dribbble.com/users/3281732/screenshots/13661330/media/1d9d3cd01504fa3f5ae5016e5ec3a313.jpg?compress=1&resize=800x800',
 ];
-
-const loopForward = (index: number) => {
-  'worklet';
-  return (index + 1) % imageURIs.length;
-};
-
-const loopBackward = (index: number) => {
-  'worklet';
-  return (index - 1 + imageURIs.length) % imageURIs.length;
-};
