@@ -6,7 +6,8 @@ import {
   Skia,
   vec,
 } from '@shopify/react-native-skia';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import { View } from 'react-native';
 import {
   Directions,
   Gesture,
@@ -19,6 +20,7 @@ import {
 } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
 
+import { CircularSlider } from '@components/CircularSlider';
 import { useImages } from '@hooks/useImages';
 import { useShader } from '@hooks/useShader';
 import { fbm } from '@shaders/fbm';
@@ -44,53 +46,87 @@ export function Reveal() {
     [shader]
   );
 
-  const index = useSharedValue(0);
+  const index1 = useSharedValue(0);
+  const index2 = useSharedValue(1);
   const progress = useSharedValue(0);
 
   const uniforms = useDerivedValue(() => ({
     uResolution: vec(rt.screen.width, rt.screen.height),
     // uTime: clock.value / 1000, // convert to seconds
-    uTime: progress.value,
+    uProgress: progress.value,
   }));
 
   const flingLeft = Gesture.Fling()
     .direction(Directions.LEFT)
     .onStart(() => {
-      progress.value = withSpring(
-        1,
-        { damping: 50, stiffness: 50 },
-        (finished) => {
-          if (finished) {
-            index.value = (index.value + 1) % images.length;
-            progress.value = 0;
-          }
-        }
-      );
+      // progress.value = withSpring(
+      //   1,
+      //   { damping: 50, stiffness: 50 },
+      //   (finished) => {
+      //     if (finished) {
+      //       index.value = (index.value + 1) % images.length;
+      //       progress.value = 0;
+      //     }
+      //   }
+      // );
     });
 
   const flingRight = Gesture.Fling()
     .direction(Directions.RIGHT)
     .onStart(() => {
-      progress.value = withSpring(
-        0,
-        { damping: 50, stiffness: 50 },
-        (finished) => {
-          if (finished) {
-            index.value = (index.value + images.length - 1) % images.length;
-            progress.value = 1.0;
-          }
-        }
-      );
+      // progress.value = withSpring(
+      //   0,
+      //   { damping: 50, stiffness: 50 },
+      //   (finished) => {
+      //     if (finished) {
+      //       index.value = (index.value + images.length - 1) % images.length;
+      //       progress.value = 1.0;
+      //     }
+      //   }
+      // );
     });
 
   const gesture = Gesture.Exclusive(flingLeft, flingRight);
 
+  const onCarouselChange = useCallback(
+    (currIndex: number, prevIndex: number) => {
+      'worklet';
+      if (currIndex === prevIndex) {
+        return;
+      }
+
+      // Inverted directions, for consistency with the fling gesture
+      const direction =
+        currIndex > prevIndex
+          ? Directions.LEFT // forward
+          : Directions.RIGHT; // backward
+
+      let toValue: number;
+
+      if (direction === Directions.LEFT) {
+        toValue = 1.0;
+        index1.value = prevIndex;
+        index2.value = currIndex;
+        progress.value = 0.0;
+      } else {
+        toValue = 0.0;
+        progress.value = 1.0;
+        index1.value = currIndex;
+        index2.value = prevIndex;
+      }
+
+      progress.value = withSpring(toValue, { damping: 50, stiffness: 50 });
+    },
+    [index1, index2, progress]
+  );
+
   const image1 = useDerivedValue(() => {
-    return images[index.value] ?? null;
+    return images[index1.value] ?? null;
   });
 
   const image2 = useDerivedValue(() => {
-    return images[(index.value + 1) % images.length] ?? null;
+    return images[index2.value] ?? null;
+    // return images[(index1.value + 1) % images.length] ?? null;
   });
 
   if (error) {
@@ -107,24 +143,27 @@ export function Reveal() {
 
   return (
     <GestureDetector gesture={gesture}>
-      <Canvas style={styles.canvas}>
-        <Fill>
-          <Shader source={skShader} uniforms={uniforms}>
-            <ImageShader
-              image={image1}
-              fit="cover"
-              width={rt.screen.width}
-              height={rt.screen.height}
-            />
-            <ImageShader
-              image={image2}
-              fit="cover"
-              width={rt.screen.width}
-              height={rt.screen.height}
-            />
-          </Shader>
-        </Fill>
-      </Canvas>
+      <View style={styles.container}>
+        <Canvas style={styles.canvas}>
+          <Fill>
+            <Shader source={skShader} uniforms={uniforms}>
+              <ImageShader
+                image={image1}
+                fit="cover"
+                width={rt.screen.width}
+                height={rt.screen.height}
+              />
+              <ImageShader
+                image={image2}
+                fit="cover"
+                width={rt.screen.width}
+                height={rt.screen.height}
+              />
+            </Shader>
+          </Fill>
+        </Canvas>
+        <CircularSlider images={imageURIs} onMomentumEnd={onCarouselChange} />
+      </View>
     </GestureDetector>
   );
 }
