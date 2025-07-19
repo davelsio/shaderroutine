@@ -2,7 +2,7 @@ uniform shader image1;
 uniform shader image2;
 
 uniform vec2 uResolution;
-uniform float uTime;
+uniform float uProgress;
 
 // const vec3 GLOW_COLOR = vec3(0.0, 0.2, 0.8); // blue glow
 
@@ -12,7 +12,7 @@ vec4 main(vec2 pxCoords) {
   // Animated effect
   float diagonal = length(uResolution); // [vec2(top, left), vec2(bottom, right)]
   float duration = 1.0;
-  float size = smoothstep(0.0, duration, uTime) * diagonal * 1.1;
+  float size = smoothstep(0.0, duration, uProgress) * diagonal * 1.1;
   float noise = fbm(vec3(pxCoords, 0.0) * 0.005, 0.5, 2.0);
   float d = sdfCircle(pxCoords + 50.0 * noise, size); // expanding circle
   // float d = sdfCircle(pxCoords * noise * 0.7, size * 0.2); // noise reveal
@@ -26,7 +26,7 @@ vec4 main(vec2 pxCoords) {
   vec3 color = initialTex;
 
   // Transition
-  color = mix(color, diffuse2, smoothstep(0.0, 1.0, -d));
+  color = mix(color, diffuse2, smoothstep(1.0, 0.0, d));
 
   // Blur effect
   float blurAmount = 1.0 - exp(-d * d * 0.001);
