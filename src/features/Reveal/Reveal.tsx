@@ -49,6 +49,7 @@ export function Reveal() {
   const index1 = useSharedValue(0);
   const index2 = useSharedValue(1);
   const progress = useSharedValue(0);
+  const animating = useSharedValue(false);
 
   const uniforms = useDerivedValue(() => ({
     uResolution: vec(rt.screen.width, rt.screen.height),
@@ -57,33 +58,51 @@ export function Reveal() {
   }));
 
   const flingLeft = Gesture.Fling()
-    .direction(Directions.LEFT)
+    .direction(Directions.LEFT) // forward
     .onStart(() => {
-      // progress.value = withSpring(
-      //   1,
-      //   { damping: 50, stiffness: 50 },
-      //   (finished) => {
-      //     if (finished) {
-      //       index.value = (index.value + 1) % images.length;
-      //       progress.value = 0;
-      //     }
-      //   }
-      // );
+      if (animating.value) {
+        return;
+      }
+
+      animating.value = true;
+      index2.value = loopForward(index1.value);
+      progress.value = 0.0;
+      progress.value = withSpring(
+        1,
+        { damping: 50, stiffness: 50 },
+        (finished) => {
+          if (finished) {
+            animating.value = false;
+            index1.value = loopForward(index1.value);
+            index2.value = loopForward(index1.value + 1);
+            progress.value = 0.0;
+          }
+        }
+      );
     });
 
   const flingRight = Gesture.Fling()
-    .direction(Directions.RIGHT)
+    .direction(Directions.RIGHT) // backward
     .onStart(() => {
-      // progress.value = withSpring(
-      //   0,
-      //   { damping: 50, stiffness: 50 },
-      //   (finished) => {
-      //     if (finished) {
-      //       index.value = (index.value + images.length - 1) % images.length;
-      //       progress.value = 1.0;
-      //     }
-      //   }
-      // );
+      if (animating.value) {
+        return;
+      }
+
+      animating.value = true;
+      index2.value = index1.value;
+      index1.value = loopBackward(index2.value);
+      progress.value = 1.0;
+
+      progress.value = withSpring(
+        0,
+        { damping: 50, stiffness: 50 },
+        (finished) => {
+          if (finished) {
+            animating.value = false;
+            index2.value = loopForward(index1.value + 1);
+          }
+        }
+      );
     });
 
   const gesture = Gesture.Exclusive(flingLeft, flingRight);
@@ -126,7 +145,6 @@ export function Reveal() {
 
   const image2 = useDerivedValue(() => {
     return images[index2.value] ?? null;
-    // return images[(index1.value + 1) % images.length] ?? null;
   });
 
   if (error) {
@@ -177,3 +195,13 @@ const imageURIs = [
   'https://cdn.dribbble.com/users/3281732/screenshots/6727912/samji_illustrator.jpeg?compress=1&resize=800x800',
   'https://cdn.dribbble.com/users/3281732/screenshots/13661330/media/1d9d3cd01504fa3f5ae5016e5ec3a313.jpg?compress=1&resize=800x800',
 ];
+
+const loopForward = (index: number) => {
+  'worklet';
+  return (index + 1) % imageURIs.length;
+};
+
+const loopBackward = (index: number) => {
+  'worklet';
+  return (index - 1 + imageURIs.length) % imageURIs.length;
+};
