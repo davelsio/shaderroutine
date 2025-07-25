@@ -4,4 +4,4 @@ I've used a circle SDF to swap between two textures, adding a bit of noise and b
 
 All the shaders used in this example, including the transition technique, I've learned in the [GLSL Shaders from Scratch](https://www.simondev.io/courses) course by the incomparable [SimonDev](https://www.simondev.io/). Do check it out!
 
-https://github.com/user-attachments/assets/d6be86ee-c52b-45d4-bb24-62c2b3ddc551
+https://github.com/user-attachments/assets/0fe436a7-ea85-41ae-a9c1-1ee5aaeacf84
