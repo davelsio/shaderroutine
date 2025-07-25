@@ -10,6 +10,14 @@
 
 ## Features
 
+#### Slider Reveal
+
+[`./features/Reveal/`](./features/Reveal/)
+
+A cool SDF-based transition effect built on top of the amazing [Circular Slider](https://www.youtube.com/watch?v=6Va1yBFdUxI&t=47s) component by [Catalin Miron](https://www.youtube.com/@CatalinMironDev/).
+
+https://github.com/user-attachments/assets/d6be86ee-c52b-45d4-bb24-62c2b3ddc551
+
 #### Sun
 
 [`./features/Sun/`](./features/Sun/)
