@@ -55,7 +55,6 @@ export function Reveal() {
   const sliderRef = useRef<CircularSliderApi>(null);
 
   const { rt } = useUnistyles();
-  // const clock = useClock();
   const { error, loading, images } = useImages(imageURIs);
 
   const { shader } = useShader(revealSkShader);
@@ -72,7 +71,6 @@ export function Reveal() {
 
   const uniforms = useDerivedValue(() => ({
     uResolution: vec(rt.screen.width, rt.screen.height),
-    // uTime: clock.value / 1000, // convert to seconds
     uProgress: progress.value,
   }));
 
