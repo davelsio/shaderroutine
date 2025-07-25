@@ -16,7 +16,7 @@
 
 A cool SDF-based transition effect built on top of the amazing [Circular Slider](https://www.youtube.com/watch?v=6Va1yBFdUxI&t=47s) component by [Catalin Miron](https://www.youtube.com/@CatalinMironDev/).
 
-https://github.com/user-attachments/assets/d6be86ee-c52b-45d4-bb24-62c2b3ddc551
+https://github.com/user-attachments/assets/0fe436a7-ea85-41ae-a9c1-1ee5aaeacf84
 
 #### Sun
 
