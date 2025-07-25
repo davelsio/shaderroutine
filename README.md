@@ -10,9 +10,17 @@
 
 ## Features
 
+#### Slider Reveal
+
+[`./features/Reveal/`](./src/features/Reveal/)
+
+A cool SDF-based transition effect built on top of the amazing [Circular Slider](https://www.youtube.com/watch?v=6Va1yBFdUxI&t=47s) component by [Catalin Miron](https://www.youtube.com/@CatalinMironDev/).
+
+https://github.com/user-attachments/assets/d6be86ee-c52b-45d4-bb24-62c2b3ddc551
+
 #### Sun
 
-[`./features/Sun/`](./features/Sun/)
+[`./features/Sun/`](./src/features/Sun/)
 
 Skia adaptation of the [main sequence star](https://www.shadertoy.com/view/4dXGR4) shader in [Shadertoy](https://www.shadertoy.com/).
 
@@ -20,7 +28,7 @@ https://github.com/user-attachments/assets/24c7cfaa-baac-486f-a6dc-64f354e6737c
 
 #### Torus
 
-[`./features/Torus/`](./features/Torus/)
+[`./features/Torus/`](./src/features/Torus/)
 
 Adaptation of [@baconbrix](https://x.com/baconbrix/status/1924919835420504339) torus example using Skia instead of Three.js.
 
