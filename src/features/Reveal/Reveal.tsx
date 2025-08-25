@@ -3,10 +3,9 @@ import {
   Fill,
   ImageShader,
   Shader,
-  Skia,
   vec,
 } from '@shopify/react-native-skia';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { View } from 'react-native';
 import {
   Directions,
@@ -24,7 +23,7 @@ import { useUnistyles } from 'react-native-unistyles';
 
 import { CircularSlider, CircularSliderApi } from '@components/CircularSlider';
 import { useImages } from '@hooks/useImages';
-import { useShader } from '@hooks/useShader';
+import { useSkShader } from '@hooks/useSkShader';
 import { fbm } from '@shaders/fbm';
 import type { ShaderModule } from '@shaders/modules';
 import { sdfCircle } from '@shaders/sdfCircle';
@@ -57,12 +56,7 @@ export function Reveal() {
   const { rt } = useUnistyles();
   const { error, loading, images } = useImages(imageURIs);
 
-  const { shader } = useShader(revealSkShader);
-
-  const skShader = useMemo(
-    () => (shader ? Skia.RuntimeEffect.Make(shader) : null),
-    [shader]
-  );
+  const { shader } = useSkShader(revealSkShader);
 
   const index1 = useSharedValue(0);
   const index2 = useSharedValue(1);
@@ -185,14 +179,14 @@ export function Reveal() {
 
   if (error) return null;
   if (loading) return null;
-  if (!skShader) return null;
+  if (!shader) return null;
 
   return (
     <GestureDetector gesture={gesture}>
       <View style={styles.container}>
         <Canvas style={styles.canvas}>
           <Fill>
-            <Shader source={skShader} uniforms={uniforms}>
+            <Shader source={shader} uniforms={uniforms}>
               <ImageShader
                 image={image1}
                 fit="cover"

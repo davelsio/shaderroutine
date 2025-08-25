@@ -6,12 +6,12 @@ import {
   useClock,
   vec,
 } from '@shopify/react-native-skia';
-import { useMemo } from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
 
-import { useShader } from '../../hooks/useShader';
+import { useSkShader } from '@hooks/useSkShader';
+
 import type { ShaderModule } from '../../shaders/modules';
 
 import styles from './Torus.styles';
@@ -24,11 +24,7 @@ export function TorusView() {
   const { rt } = useUnistyles();
   const clock = useClock();
 
-  const { shader } = useShader(torusSkShader);
-  const skShader = useMemo(
-    () => (shader ? Skia.RuntimeEffect.Make(shader) : null),
-    [shader]
-  );
+  const { shader } = useSkShader(torusSkShader);
 
   const uRotation = useSharedValue(0.0);
 
@@ -56,7 +52,7 @@ export function TorusView() {
       uRotation.value = gestureContext.value + t * Math.PI;
     });
 
-  if (!skShader) {
+  if (!shader) {
     return null;
   }
 
@@ -64,7 +60,7 @@ export function TorusView() {
     <GestureDetector gesture={gesture}>
       <Canvas style={styles.canvas}>
         <Fill>
-          <Shader source={skShader} uniforms={uniforms} />
+          <Shader source={shader} uniforms={uniforms} />
         </Fill>
       </Canvas>
     </GestureDetector>

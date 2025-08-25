@@ -29,7 +29,8 @@ import Animated, {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUnistyles } from 'react-native-unistyles';
 
-import { useShader } from '../../hooks/useShader';
+import { useSkShader } from '@hooks/useSkShader';
+
 import type { ShaderModule } from '../../shaders/modules';
 import { remap } from '../../shaders/remap';
 import springEasings from '../../utils/springEasings';
@@ -107,11 +108,7 @@ export function SunView() {
 
   const surface = useImage(require('@assets/textures/sun.png'));
 
-  const { shader } = useShader(sunSkShader);
-  const skShader = useMemo(
-    () => (shader ? Skia.RuntimeEffect.Make(shader) : null),
-    [shader]
-  );
+  const { shader } = useSkShader(sunSkShader);
 
   const presetValues = useMemo(() => {
     const keys = Object.keys(DEFAULT_PRESETS);
@@ -160,7 +157,7 @@ export function SunView() {
     [state]
   );
 
-  if (!skShader) {
+  if (!shader) {
     return null;
   }
 
@@ -169,7 +166,7 @@ export function SunView() {
       <GestureDetector gesture={gesture}>
         <Canvas style={styles.canvas}>
           <Fill>
-            <Shader source={skShader} uniforms={uniforms}>
+            <Shader source={shader} uniforms={uniforms}>
               <ImageShader
                 image={surface}
                 fit="fill"

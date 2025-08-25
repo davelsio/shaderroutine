@@ -3,18 +3,16 @@ import {
   Fill,
   ImageShader,
   Shader,
-  Skia,
   useClock,
   useImage,
   vec,
 } from '@shopify/react-native-skia';
-import { useMemo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
 
-import { useShader } from '../../hooks/useShader';
-import type { ShaderModule } from '../../shaders/modules';
-import { remap } from '../../shaders/remap';
+import { useSkShader } from '@hooks/useSkShader';
+import type { ShaderModule } from '@shaders/modules';
+import { remap } from '@shaders/remap';
 
 import styles from './Cathode.styles';
 
@@ -31,25 +29,21 @@ export function CathodeView() {
   const clock = useClock();
   const image = useImage(imageURI);
 
-  const { shader } = useShader(cathodeSkShader);
-  const skShader = useMemo(
-    () => (shader ? Skia.RuntimeEffect.Make(shader) : null),
-    [shader]
-  );
+  const { shader } = useSkShader(cathodeSkShader);
 
   const uniforms = useDerivedValue(() => ({
     uResolution: vec(rt.screen.width, rt.screen.height),
     uTime: clock.value / 1000, // convert to seconds
   }));
 
-  if (!skShader) {
+  if (!shader) {
     return null;
   }
 
   return (
     <Canvas style={styles.canvas}>
       <Fill>
-        <Shader source={skShader} uniforms={uniforms}>
+        <Shader source={shader} uniforms={uniforms}>
           <ImageShader
             image={image}
             fit="cover"
