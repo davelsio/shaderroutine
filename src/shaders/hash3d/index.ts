@@ -1,1 +1,5 @@
-export * from './hash3d';
+import type { ShaderModule } from '../modules';
+
+export const hash3d: ShaderModule = {
+  module: require('./hash3d.glsl'),
+};
