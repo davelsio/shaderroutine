@@ -14,14 +14,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: false,
     bundleIdentifier: 'com.davelsio.shaderroutine',
     icon: {
-      dark: './src/assets/app/icon-ios-dark.png',
-      light: './src/assets/app/icon-ios-light.png',
-      tinted: './src/assets/app/icon-ios-tinted.png',
+      dark: './src/assets/app/icon_ios_dark.png',
+      light: './src/assets/app/icon_ios_light.png',
+      tinted: './src/assets/app/icon_ios_tinted.png',
     },
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './src/assets/app/adaptive-icon.png',
+      foregroundImage: './src/assets/app/adaptive_icon.png',
       backgroundColor: '#ffffff',
       // backgroundImage: './assets/app/adaptive-icon-background.png',
     },
@@ -58,7 +58,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           backgroundColor: '#ffffff',
           imageWidth: 200,
           dark: {
-            image: './src/assets/app/splash-dark.png',
+            image: './src/assets/app/splash_dark.png',
             backgroundColor: '#000000',
           },
         },
@@ -68,7 +68,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           backgroundColor: '#ffffff',
           imageWidth: 150,
           dark: {
-            image: './src/assets/app/splash-dark.png',
+            image: './src/assets/app/splash_dark.png',
             backgroundColor: '#000000',
           },
         },
