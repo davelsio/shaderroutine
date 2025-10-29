@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     adaptiveIcon: {
       foregroundImage: './src/assets/app/adaptive_icon.png',
       backgroundColor: '#ffffff',
-      // backgroundImage: './assets/app/adaptive-icon-background.png',
+      // backgroundImage: './assets/app/adaptive_icon_background.png',
     },
     package: 'com.davelsio.shaderroutine',
   },
