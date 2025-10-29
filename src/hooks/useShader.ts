@@ -1,5 +1,5 @@
 import { Asset } from 'expo-asset';
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system';
 import { useEffect, useState } from 'react';
 
 import type { ShaderModule } from '../shaders/modules';
@@ -81,7 +81,7 @@ async function loadShaderModule(module: number) {
     throw new Error(`Failed to load shader file: ${file.name}`);
   }
 
-  const shader = await FileSystem.readAsStringAsync(file.localUri);
+  const shader = await new File(file.localUri).text();
 
   shaderCache.set(module, shader);
 
