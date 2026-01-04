@@ -1,10 +1,14 @@
+// This file is web-only and used to configure the root HTML for every web page
+// during static rendering. The contents of this function only run in Node.js
+// environments and do not have access to the DOM or browser APIs.
+// Learn more https://docs.expo.dev/router/reference/static-rendering/#root-html
+
 import { ScrollViewStyleReset } from 'expo-router/html';
 import { type PropsWithChildren } from 'react';
 
-/**
- * This file is web-only and used to configure the root HTML for every web page during static rendering.
- * The contents of this function only run in Node.js environments and do not have access to the DOM or browser APIs.
- */
+import { darkTheme } from '@theme/default-dark';
+import { lightTheme } from '@theme/default-light';
+
 export default function Root({ children }: PropsWithChildren) {
   return (
     <html lang="en">
@@ -22,21 +26,29 @@ export default function Root({ children }: PropsWithChildren) {
         */}
         <ScrollViewStyleReset />
 
-        {/* Using raw CSS styles as an escape-hatch to ensure the background color never flickers in dark-mode. */}
-        <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
         {/* Add any additional <head> elements that you want globally available on web... */}
+
+        {/*
+          Escape-hatch to ensure the background color does not flicker in dark
+          mode. Set the body background synchronously before JS loads, matching
+          the theme's grayBase color for both light and dark modes.
+        */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              body {
+                background-color: ${lightTheme.colors.grayBase};
+              }
+              @media (prefers-color-scheme: dark) {
+                body {
+                  background-color: ${darkTheme.colors.grayBase};
+                }
+              }
+            `,
+          }}
+        />
       </head>
       <body>{children}</body>
     </html>
   );
 }
-
-const responsiveBackground = `
-body {
-  background-color: #fff;
-}
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #000;
-  }
-}`;
