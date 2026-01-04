@@ -1,3 +1,8 @@
+/** @type {import('react-native-worklets/plugin').PluginOptions} */
+const workletsPluginOptions = {
+  // Your custom options.
+};
+
 /** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
 const unistylesOptions = {
   root: './src',
@@ -16,6 +21,7 @@ module.exports = function (api) {
     plugins: [
       ['react-native-unistyles/plugin', unistylesOptions],
       ['unplugin-typegpu/babel'],
+      ['react-native-worklets/plugin', workletsPluginOptions],
     ],
   };
 };

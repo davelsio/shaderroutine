@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { interpolateColor, runOnJS } from 'react-native-reanimated';
+import { interpolateColor } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import {
   BrightnessSlider,
@@ -21,8 +22,8 @@ export function SunControlsView() {
 
   const refreshPreset = useCallback(() => {
     'worklet';
-    runOnJS(setPreset)(state.preset.value);
-    runOnJS(state.updateCustom)(state.preset.value);
+    scheduleOnRN(setPreset, state.preset.value);
+    scheduleOnRN(state.updateCustom, state.preset.value);
   }, [state.preset, state.updateCustom]);
 
   const onCoronaPickerUpdate = useCallback(

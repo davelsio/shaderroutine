@@ -13,13 +13,13 @@ import {
   GestureDetector,
 } from 'react-native-gesture-handler';
 import {
-  runOnJS,
   useDerivedValue,
   useSharedValue,
   withSpring,
   WithSpringConfig,
 } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { CircularSlider, CircularSliderApi } from '@components/CircularSlider';
 import { useImages } from '@hooks/useImages';
@@ -97,7 +97,7 @@ export function Reveal() {
         }
       });
 
-      runOnJS(scrollToIndex)(index2.value);
+      scheduleOnRN(scrollToIndex, index2.value);
     });
 
   const flingRight = Gesture.Fling()
@@ -119,7 +119,7 @@ export function Reveal() {
         }
       });
 
-      runOnJS(scrollToIndex)(index1.value);
+      scheduleOnRN(scrollToIndex, index1.value);
     });
 
   const gesture = Gesture.Exclusive(flingLeft, flingRight);
