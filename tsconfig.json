@@ -3,25 +3,21 @@
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "types": ["@webgpu/types"],
     "paths": {
-      "@api/*": [ "./src/api/*" ],
-      "@assets/*": [ "./src/assets/*" ],
-      "@components/*": [ "./src/components/*" ],
-      "@features/*": [ "./src/features/*" ],
-      "@forms/*": [ "./src/forms/*" ],
-      "@helpers/*": [ "./src/helpers/*" ],
-      "@hooks/*": [ "./src/hooks/*" ],
-      "@shaders/*": [ "./src/shaders/*" ],
-      "@state/*": [ "./src/state/*" ],
-      "@theme/*": [ "./src/theme/*" ],
-      "@typography/*": [ "./src/typography/*" ],
-      "@utils/*": [ "./src/utils/*" ],
+      "@api/*": ["./src/api/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@components/*": ["./src/components/*"],
+      "@features/*": ["./src/features/*"],
+      "@forms/*": ["./src/forms/*"],
+      "@helpers/*": ["./src/helpers/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@shaders/*": ["./src/shaders/*"],
+      "@state/*": ["./src/state/*"],
+      "@theme/*": ["./src/theme/*"],
+      "@typography/*": ["./src/typography/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }

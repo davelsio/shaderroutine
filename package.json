@@ -17,6 +17,7 @@
     "format": "prettier --check --write --no-error-on-unmatched-pattern ./**/*.{ts,tsx,md} ./**/*.{ts,tsx,md}",
     "test": "jest",
     "expo:check": "expo install --check",
+    "expo:customize": "expo customize",
     "expo:doctor": "pnpx expo-doctor --verbose",
     "expo:install": "expo install --pnpm",
     "expo:prebuild": "expo prebuild --clean",
@@ -52,8 +53,9 @@
     "@react-native-segmented-control/segmented-control": "^2.5.7",
     "@react-navigation/native": "^7.1.6",
     "@shopify/react-native-skia": "2.2.12",
+    "@typegpu/noise": "^0.9.0",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
-    "expo": "~54.0.22",
+    "expo": "~54.0.23",
     "expo-asset": "~12.0.9",
     "expo-build-properties": "~1.0.9",
     "expo-constants": "~18.0.10",
@@ -82,8 +84,10 @@
     "react-native-svg": "^15.12.1",
     "react-native-unistyles": "3.0.16",
     "react-native-web": "~0.21.2",
+    "react-native-wgpu": "^0.4.2",
     "react-native-worklets": "^0.5.1",
     "reanimated-color-picker": "^4.1.1",
+    "typegpu": "^0.9.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
@@ -91,6 +95,7 @@
     "@types/jest": "^29.5.14",
     "@types/react": "~19.1.17",
     "@types/react-test-renderer": "^19.1.0",
+    "@webgpu/types": "^0.1.68",
     "babel-plugin-react-compiler": "^1.0.0",
     "babel-preset-expo": "^54.0.6",
     "eslint": "^9.38.0",
@@ -100,7 +105,8 @@
     "jest-expo": "54.0.13",
     "prettier": "^3.6.2",
     "react-test-renderer": "19.1.0",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "unplugin-typegpu": "^0.9.0"
   },
   "packageManager": "pnpm@10.20.0"
 }
