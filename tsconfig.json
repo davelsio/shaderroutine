@@ -2,7 +2,6 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "noUncheckedIndexedAccess": true,
     "types": ["@webgpu/types"],
     "paths": {
       "@api/*": ["./src/api/*"],
@@ -19,5 +18,6 @@
       "@utils/*": ["./src/utils/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "exclude": ["**/typegpu/**/*"]
 }

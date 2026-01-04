@@ -21,7 +21,8 @@
     "expo:doctor": "pnpx expo-doctor --verbose",
     "expo:install": "expo install --pnpm",
     "expo:prebuild": "expo prebuild --clean",
-    "tsc:check": "tsc --noEmit",
+    "tsc:check": "tsc --noEmit --noUncheckedIndexedAccess",
+    "tsc:check:tgpu": "tsc --noEmit -p tsconfig.tgpu.json",
     "tsc:config": "tsc --showConfig"
   },
   "expo": {
