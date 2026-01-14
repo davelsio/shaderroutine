@@ -5,7 +5,7 @@ import {
   Shader,
   vec,
 } from '@shopify/react-native-skia';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { View } from 'react-native';
 import {
   Directions,
@@ -19,9 +19,8 @@ import {
   WithSpringConfig,
 } from 'react-native-reanimated';
 import { useUnistyles } from 'react-native-unistyles';
-import { scheduleOnRN } from 'react-native-worklets';
 
-import { CircularSlider, CircularSliderApi } from '@components/CircularSlider';
+import { CircularSlider } from '@components/CircularSlider';
 import { useImages } from '@hooks/useImages';
 import { useSkShader } from '@hooks/useShader';
 import { fbm } from '@shaders/fbm';
@@ -51,8 +50,6 @@ const scrollSpring: WithSpringConfig = {
 };
 
 export function Reveal() {
-  const sliderRef = useRef<CircularSliderApi>(null);
-
   const { rt } = useUnistyles();
   const { error, loading, images } = useImages(imageURIs);
 
@@ -62,21 +59,12 @@ export function Reveal() {
   const nextIndex = useSharedValue(1);
   const progress = useSharedValue(0);
   const animating = useSharedValue(false);
+  const scrollIndex = useSharedValue(0);
 
   const uniforms = useDerivedValue(() => ({
     uResolution: vec(rt.screen.width, rt.screen.height),
     uProgress: progress.value,
   }));
-
-  const scrollToIndex = useCallback(
-    (index: number) => {
-      sliderRef.current?.scrollToIndex({
-        index,
-        animated: true,
-      });
-    },
-    [sliderRef]
-  );
 
   const flingLeft = Gesture.Fling()
     .direction(Directions.LEFT) // forward
@@ -99,7 +87,7 @@ export function Reveal() {
         })
       );
 
-      scheduleOnRN(scrollToIndex, nextIndex.value);
+      scrollIndex.set(nextIndex.value);
     });
 
   const flingRight = Gesture.Fling()
@@ -123,7 +111,7 @@ export function Reveal() {
         })
       );
 
-      scheduleOnRN(scrollToIndex, currIndex.value);
+      scrollIndex.set(currIndex.value);
     });
 
   const gesture = Gesture.Exclusive(flingLeft, flingRight);
@@ -209,8 +197,8 @@ export function Reveal() {
           </Fill>
         </Canvas>
         <CircularSlider
-          ref={sliderRef}
           images={imageURIs}
+          index={scrollIndex}
           onMomentumEnd={onCarouselChange}
         />
       </View>

@@ -1,38 +1,35 @@
-import {
-  type RefObject,
-  useCallback,
-  useImperativeHandle,
-  useRef,
-} from 'react';
+import { useCallback, useRef } from 'react';
 import type {
   NativeScrollEvent,
   NativeSyntheticEvent,
   ListRenderItem,
 } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import { clamp, useSharedValue } from 'react-native-reanimated';
+import {
+  clamp,
+  SharedValue,
+  useAnimatedReaction,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import styles, { ITEM_SIZE, ITEM_SPACING } from './CircularSlider.styles';
 import { CircularSliderItem } from './CircularSliderItem';
 
 type CircularSliderProps = {
   images: string[];
+  index?: SharedValue<number>;
   onChange?: (currIndex: number, prevIndex: number) => void;
   onMomentumEnd?: (currIndex: number, prevIndex: number) => void;
-  ref?: RefObject<CircularSliderApi | null>;
-};
-
-export type CircularSliderApi = {
-  scrollToIndex: (props: { index: number; animated?: boolean }) => void;
 };
 
 const ITEM_TOTAL_SIZE = ITEM_SIZE + ITEM_SPACING;
 
 export function CircularSlider({
   images,
+  index,
   onChange,
   onMomentumEnd,
-  ref,
 }: CircularSliderProps) {
   const sliderRef = useRef<FlatList<string> | null>(null);
 
@@ -40,14 +37,23 @@ export function CircularSlider({
   const prevIndex = useSharedValue(0);
   const activeIndex = useSharedValue(0);
 
-  useImperativeHandle(ref, () => ({
-    scrollToIndex: (props: { index: number; animated?: boolean }) => {
-      sliderRef.current?.scrollToOffset({
-        offset: props.index * ITEM_TOTAL_SIZE,
-        animated: true,
-      });
-    },
-  }));
+  const scrollToIndex = (index: number) => {
+    sliderRef.current?.scrollToOffset({
+      offset: index * ITEM_TOTAL_SIZE,
+      animated: true,
+    });
+  };
+
+  useAnimatedReaction(
+    () => index?.get() ?? null,
+    (val) => {
+      if (val === null) {
+        return;
+      }
+
+      scheduleOnRN(scrollToIndex, val);
+    }
+  );
 
   const onScrollMomentumEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
