@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { interpolateColor } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
@@ -20,47 +20,38 @@ export function SunControlsView() {
   const state = useSunState();
   const [preset, setPreset] = useState<SunPreset>(() => state.preset.get());
 
-  const refreshPreset = useCallback(() => {
+  const refreshPreset = () => {
     'worklet';
     scheduleOnRN(setPreset, state.preset.value);
     scheduleOnRN(state.updateCustom, state.preset.value);
-  }, [state.preset, state.updateCustom]);
+  };
 
-  const onCoronaPickerUpdate = useCallback(
-    (color: ColorFormatsObject) => {
-      'worklet';
-      state.preset.value = {
-        ...state.preset.value,
-        corona: color.hex,
-      };
-    },
-    [state.preset]
-  );
+  const onCoronaPickerUpdate = (color: ColorFormatsObject) => {
+    'worklet';
+    state.preset.set({
+      ...state.preset.value,
+      corona: color.hex,
+    });
+  };
 
-  const onGlowPickerUpdate = useCallback(
-    (color: ColorFormatsObject) => {
-      'worklet';
-      state.preset.value = {
-        ...state.preset.value,
-        glow: color.hex,
-      };
-    },
-    [state.preset]
-  );
+  const onGlowPickerUpdate = (color: ColorFormatsObject) => {
+    'worklet';
+    state.preset.set({
+      ...state.preset.value,
+      glow: color.hex,
+    });
+  };
 
-  const onBrightnessChange = useCallback(
-    (color: ColorFormatsObject) => {
-      'worklet';
-      const match = color.hsv.match(/[\d.]+/g);
-      if (!match) return;
-      const opacity = Number(match[match.length - 1]) / 100;
-      state.preset.value = {
-        ...state.preset.value,
-        brightness: opacity,
-      };
-    },
-    [state.preset]
-  );
+  const onBrightnessChange = (color: ColorFormatsObject) => {
+    'worklet';
+    const match = color.hsv.match(/[\d.]+/g);
+    if (!match) return;
+    const opacity = Number(match[match.length - 1]) / 100;
+    state.preset.set({
+      ...state.preset.value,
+      brightness: opacity,
+    });
+  };
 
   const bColor = useMemo(() => {
     const mix = interpolateColor(
@@ -78,16 +69,13 @@ export function SunControlsView() {
     return hsv;
   }, [preset]);
 
-  const onRadiusChange = useCallback(
-    (value: number) => {
-      'worklet';
-      state.preset.value = {
-        ...state.preset.value,
-        radius: value,
-      };
-    },
-    [state.preset]
-  );
+  const onRadiusChange = (value: number) => {
+    'worklet';
+    state.preset.set({
+      ...state.preset.value,
+      radius: value,
+    });
+  };
 
   return (
     <View style={styles.controls}>

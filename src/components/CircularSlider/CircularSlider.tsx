@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 import type {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -55,37 +55,28 @@ export function CircularSlider({
     }
   );
 
-  const onScrollMomentumEnd = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      prevIndex.set(activeIndex.value);
-      onMomentumEnd?.(activeIndex.value, prevIndex.value);
-    },
-    [activeIndex, onMomentumEnd, prevIndex]
-  );
+  const onScrollMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    prevIndex.set(activeIndex.value);
+    onMomentumEnd?.(activeIndex.value, prevIndex.value);
+  };
 
-  const onScroll = useCallback(
-    ({
-      nativeEvent: { contentOffset },
-    }: NativeSyntheticEvent<NativeScrollEvent>) => {
-      scrollIndex.set(
-        clamp(contentOffset.x / ITEM_TOTAL_SIZE, 0, images.length - 1)
-      );
-      activeIndex.set(Math.round(scrollIndex.value));
+  const onScroll = ({
+    nativeEvent: { contentOffset },
+  }: NativeSyntheticEvent<NativeScrollEvent>) => {
+    scrollIndex.set(
+      clamp(contentOffset.x / ITEM_TOTAL_SIZE, 0, images.length - 1)
+    );
+    activeIndex.set(Math.round(scrollIndex.value));
 
-      onChange?.(activeIndex.value, prevIndex.value);
-    },
-    [images, activeIndex, onChange, scrollIndex, prevIndex]
-  );
+    onChange?.(activeIndex.value, prevIndex.value);
+  };
 
-  const renderItem = useCallback<ListRenderItem<string>>(
-    ({ item, index }) => (
-      <CircularSliderItem
-        imageUri={item}
-        index={index}
-        scrollIndex={scrollIndex}
-      />
-    ),
-    [scrollIndex]
+  const renderItem: ListRenderItem<string> = ({ item, index }) => (
+    <CircularSliderItem
+      imageUri={item}
+      index={index}
+      scrollIndex={scrollIndex}
+    />
   );
 
   return (

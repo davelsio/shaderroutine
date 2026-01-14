@@ -15,11 +15,10 @@ import {
 } from '@shopify/react-native-skia';
 import * as Haptics from 'expo-haptics';
 import { router, usePathname } from 'expo-router';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-  runOnJS,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -28,6 +27,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUnistyles } from 'react-native-unistyles';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { useSkShader } from '@hooks/useShader';
 
@@ -116,20 +116,20 @@ export function SunView() {
   }, [state.hasCustom]);
 
   /**
-   * Show the custom controls view when long pressing on the main screen.
-   * Adjust the shader viewport height to make room for the controls.
+   * Show the custom controls view when long pressing on the main screen,
+   * and adjust the shader viewport height to make room for the controls.
    */
   const showControlsGesture = Gesture.LongPress().onStart(() => {
     if (pathname !== '/sun') {
       return;
     }
 
-    runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+    scheduleOnRN(Haptics.impactAsync, Haptics.ImpactFeedbackStyle.Light);
 
     state.height.set(
       withSpring(rt.screen.height / 1.75, springEasings.easeOut)
     );
-    runOnJS(router.navigate)('/sun/controls');
+    scheduleOnRN(router.navigate, '/sun/controls');
   });
 
   /**
@@ -141,20 +141,17 @@ export function SunView() {
       showPicker.set(!showPicker.value);
     } else {
       state.height.set(withSpring(rt.screen.height, springEasings.easeOut));
-      runOnJS(router.dismissAll)();
+      scheduleOnRN(router.dismissAll);
     }
   });
 
   const gesture = Gesture.Race(showControlsGesture, togglePickerGesture);
 
-  const selectPreset = useCallback(
-    ({
-      nativeEvent,
-    }: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>) => {
-      state.selectPreset(nativeEvent.value as PresetName);
-    },
-    [state]
-  );
+  const selectPreset = ({
+    nativeEvent,
+  }: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>) => {
+    state.selectPreset(nativeEvent.value as PresetName);
+  };
 
   if (!shader) {
     return null;

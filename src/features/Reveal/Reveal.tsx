@@ -5,7 +5,6 @@ import {
   Shader,
   vec,
 } from '@shopify/react-native-skia';
-import { useCallback } from 'react';
 import { View } from 'react-native';
 import {
   Directions,
@@ -116,52 +115,49 @@ export function Reveal() {
 
   const gesture = Gesture.Exclusive(flingLeft, flingRight);
 
-  const onCarouselChange = useCallback(
-    (_currIndex: number, _prevIndex: number) => {
-      'worklet';
-      if (_currIndex === _prevIndex) {
-        return;
-      }
+  const onCarouselChange = (_currIndex: number, _prevIndex: number) => {
+    'worklet';
+    if (_currIndex === _prevIndex) {
+      return;
+    }
 
-      if (animating.value) {
-        return;
-      }
+    if (animating.value) {
+      return;
+    }
 
-      animating.set(true);
+    animating.set(true);
 
-      // Inverted directions, for consistency with the fling gesture
-      const direction =
-        _currIndex > _prevIndex
-          ? Directions.LEFT // forward
-          : Directions.RIGHT; // backward
+    // Inverted directions, for consistency with the fling gesture
+    const direction =
+      _currIndex > _prevIndex
+        ? Directions.LEFT // forward
+        : Directions.RIGHT; // backward
 
-      let toValue: number;
+    let toValue: number;
 
-      if (direction === Directions.LEFT) {
-        toValue = 1.0;
-        currIndex.set(_prevIndex);
-        nextIndex.set(_currIndex);
-        progress.set(0.0);
-      } else {
-        toValue = 0.0;
-        progress.set(1.0);
-        currIndex.set(_currIndex);
-        nextIndex.set(_prevIndex);
-      }
+    if (direction === Directions.LEFT) {
+      toValue = 1.0;
+      currIndex.set(_prevIndex);
+      nextIndex.set(_currIndex);
+      progress.set(0.0);
+    } else {
+      toValue = 0.0;
+      progress.set(1.0);
+      currIndex.set(_currIndex);
+      nextIndex.set(_prevIndex);
+    }
 
-      progress.set(
-        withSpring(toValue, scrollSpring, (finished) => {
-          if (finished) {
-            currIndex.set(_currIndex);
-            nextIndex.set(loopForward(_currIndex, imageURIs.length));
-            progress.set(0.0);
-            animating.set(false);
-          }
-        })
-      );
-    },
-    [animating, currIndex, nextIndex, progress]
-  );
+    progress.set(
+      withSpring(toValue, scrollSpring, (finished) => {
+        if (finished) {
+          currIndex.set(_currIndex);
+          nextIndex.set(loopForward(_currIndex, imageURIs.length));
+          progress.set(0.0);
+          animating.set(false);
+        }
+      })
+    );
+  };
 
   const image1 = useDerivedValue(() => {
     return images[currIndex.value] ?? null;
