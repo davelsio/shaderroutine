@@ -58,8 +58,8 @@ export function Reveal() {
 
   const { shader } = useSkShader(revealSkShader);
 
-  const index1 = useSharedValue(0);
-  const index2 = useSharedValue(1);
+  const currIndex = useSharedValue(0);
+  const nextIndex = useSharedValue(1);
   const progress = useSharedValue(0);
   const animating = useSharedValue(false);
 
@@ -85,19 +85,21 @@ export function Reveal() {
         return;
       }
 
-      animating.value = true;
-      index2.value = loopForward(index1.value, imageURIs.length);
-      progress.value = 0.0;
-      progress.value = withSpring(1, flingSpring, (finished) => {
-        if (finished) {
-          animating.value = false;
-          index1.value = loopForward(index1.value, imageURIs.length);
-          index2.value = loopForward(index1.value, imageURIs.length);
-          progress.value = 0.0;
-        }
-      });
+      animating.set(true);
+      nextIndex.set(loopForward(currIndex.value, imageURIs.length));
+      progress.set(0.0);
+      progress.set(
+        withSpring(1, flingSpring, (finished) => {
+          if (finished) {
+            animating.set(false);
+            currIndex.set(loopForward(currIndex.value, imageURIs.length));
+            nextIndex.set(loopForward(currIndex.value, imageURIs.length));
+            progress.set(0.0);
+          }
+        })
+      );
 
-      scheduleOnRN(scrollToIndex, index2.value);
+      scheduleOnRN(scrollToIndex, nextIndex.value);
     });
 
   const flingRight = Gesture.Fling()
@@ -107,27 +109,29 @@ export function Reveal() {
         return;
       }
 
-      animating.value = true;
-      index2.value = index1.value;
-      index1.value = loopBackward(index2.value, imageURIs.length);
-      progress.value = 1.0;
+      animating.set(true);
+      nextIndex.set(currIndex.value);
+      currIndex.set(loopBackward(nextIndex.value, imageURIs.length));
+      progress.set(1.0);
 
-      progress.value = withSpring(0, flingSpring, (finished) => {
-        if (finished) {
-          animating.value = false;
-          index2.value = loopForward(index1.value, imageURIs.length);
-        }
-      });
+      progress.set(
+        withSpring(0, flingSpring, (finished) => {
+          if (finished) {
+            animating.set(false);
+            nextIndex.set(loopForward(currIndex.value, imageURIs.length));
+          }
+        })
+      );
 
-      scheduleOnRN(scrollToIndex, index1.value);
+      scheduleOnRN(scrollToIndex, currIndex.value);
     });
 
   const gesture = Gesture.Exclusive(flingLeft, flingRight);
 
   const onCarouselChange = useCallback(
-    (currIndex: number, prevIndex: number) => {
+    (_currIndex: number, _prevIndex: number) => {
       'worklet';
-      if (currIndex === prevIndex) {
+      if (_currIndex === _prevIndex) {
         return;
       }
 
@@ -135,11 +139,11 @@ export function Reveal() {
         return;
       }
 
-      animating.value = true;
+      animating.set(true);
 
       // Inverted directions, for consistency with the fling gesture
       const direction =
-        currIndex > prevIndex
+        _currIndex > _prevIndex
           ? Directions.LEFT // forward
           : Directions.RIGHT; // backward
 
@@ -147,34 +151,36 @@ export function Reveal() {
 
       if (direction === Directions.LEFT) {
         toValue = 1.0;
-        index1.value = prevIndex;
-        index2.value = currIndex;
-        progress.value = 0.0;
+        currIndex.set(_prevIndex);
+        nextIndex.set(_currIndex);
+        progress.set(0.0);
       } else {
         toValue = 0.0;
-        progress.value = 1.0;
-        index1.value = currIndex;
-        index2.value = prevIndex;
+        progress.set(1.0);
+        currIndex.set(_currIndex);
+        nextIndex.set(_prevIndex);
       }
 
-      progress.value = withSpring(toValue, scrollSpring, (finished) => {
-        if (finished) {
-          index1.value = currIndex;
-          index2.value = loopForward(currIndex, imageURIs.length);
-          progress.value = 0.0;
-          animating.value = false;
-        }
-      });
+      progress.set(
+        withSpring(toValue, scrollSpring, (finished) => {
+          if (finished) {
+            currIndex.set(_currIndex);
+            nextIndex.set(loopForward(_currIndex, imageURIs.length));
+            progress.set(0.0);
+            animating.set(false);
+          }
+        })
+      );
     },
-    [animating, index1, index2, progress]
+    [animating, currIndex, nextIndex, progress]
   );
 
   const image1 = useDerivedValue(() => {
-    return images[index1.value] ?? null;
+    return images[currIndex.value] ?? null;
   });
 
   const image2 = useDerivedValue(() => {
-    return images[index2.value] ?? null;
+    return images[nextIndex.value] ?? null;
   });
 
   if (error) return null;

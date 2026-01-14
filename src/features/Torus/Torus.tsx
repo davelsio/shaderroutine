@@ -49,7 +49,7 @@ export function TorusView() {
     .onUpdate(({ translationX }) => {
       'worklet';
       let t = translationX / rt.screen.width;
-      uRotation.value = gestureContext.value + t * Math.PI;
+      uRotation.set(gestureContext.value + t * Math.PI);
     });
 
   if (!shader) {

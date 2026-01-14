@@ -51,7 +51,7 @@ export function CircularSlider({
 
   const onScrollMomentumEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      prevIndex.value = activeIndex.value;
+      prevIndex.set(activeIndex.value);
       onMomentumEnd?.(activeIndex.value, prevIndex.value);
     },
     [activeIndex, onMomentumEnd, prevIndex]
@@ -61,12 +61,10 @@ export function CircularSlider({
     ({
       nativeEvent: { contentOffset },
     }: NativeSyntheticEvent<NativeScrollEvent>) => {
-      scrollIndex.value = clamp(
-        contentOffset.x / ITEM_TOTAL_SIZE,
-        0,
-        images.length - 1
+      scrollIndex.set(
+        clamp(contentOffset.x / ITEM_TOTAL_SIZE, 0, images.length - 1)
       );
-      activeIndex.value = Math.round(scrollIndex.value);
+      activeIndex.set(Math.round(scrollIndex.value));
 
       onChange?.(activeIndex.value, prevIndex.value);
     },

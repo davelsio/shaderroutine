@@ -126,9 +126,8 @@ export function SunView() {
 
     runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
 
-    state.height.value = withSpring(
-      rt.screen.height / 1.75,
-      springEasings.easeOut
+    state.height.set(
+      withSpring(rt.screen.height / 1.75, springEasings.easeOut)
     );
     runOnJS(router.navigate)('/sun/controls');
   });
@@ -139,9 +138,9 @@ export function SunView() {
    */
   const togglePickerGesture = Gesture.Tap().onStart(() => {
     if (pathname === '/sun') {
-      showPicker.value = !showPicker.value;
+      showPicker.set(!showPicker.value);
     } else {
-      state.height.value = withSpring(rt.screen.height, springEasings.easeOut);
+      state.height.set(withSpring(rt.screen.height, springEasings.easeOut));
       runOnJS(router.dismissAll)();
     }
   });
