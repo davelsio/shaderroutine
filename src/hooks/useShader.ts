@@ -2,9 +2,9 @@ import { Asset } from 'expo-asset';
 import { File } from 'expo-file-system';
 import { useEffect, useState } from 'react';
 
-import type { ShaderModule } from '../shaders/modules';
-import { resolveNodeDependencies } from '../utils/resolveNodeDependencies';
-import { withAbort } from '../utils/withAbort';
+import type { ShaderModule } from '@shaders/modules';
+import { dfsSort } from '@utils/depthFirstSearch';
+import { withAbort } from '@utils/withAbort';
 
 const shaderCache = new Map<number, string>();
 
@@ -53,7 +53,7 @@ export function useShader(module: ShaderModule) {
  * @param tree shader module
  */
 async function composeShader(tree: ShaderModule) {
-  const resolved = resolveNodeDependencies(tree);
+  const resolved = dfsSort(tree);
 
   const loadedModules = await Promise.all(
     resolved.map(({ module }) => loadShaderModule(module))
