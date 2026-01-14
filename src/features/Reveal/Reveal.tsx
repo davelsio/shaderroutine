@@ -23,7 +23,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { CircularSlider, CircularSliderApi } from '@components/CircularSlider';
 import { useImages } from '@hooks/useImages';
-import { useSkShader } from '@hooks/useSkShader';
+import { useSkShader } from '@hooks/useShader';
 import { fbm } from '@shaders/fbm';
 import type { ShaderModule } from '@shaders/modules';
 import { sdfCircle } from '@shaders/sdfCircle';

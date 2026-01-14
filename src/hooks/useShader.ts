@@ -1,89 +1,32 @@
-import { Asset } from 'expo-asset';
-import { File } from 'expo-file-system';
-import { useEffect, useState } from 'react';
+import { Skia } from '@shopify/react-native-skia';
+import { useAtomValue } from 'jotai';
+import { useMemo } from 'react';
 
-import type { ShaderModule } from '@shaders/modules';
-import { dfsSort } from '@utils/depthFirstSearch';
-import { withAbort } from '@utils/withAbort';
-
-const shaderCache = new Map<number, string>();
+import { type ShaderModule, shaderFamily } from '@shaders/modules';
 
 /**
- * Resolve a shader module tree and its depedencies into a final string that
- * can be consumed by the appropriate compiler.
+ * Convenience hook to resolve the shader module tree into a single string.
  * @param module shader module
  */
 export function useShader(module: ShaderModule) {
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [shader, setShader] = useState<string | null>(null);
-
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    setLoading(true);
-    composeShader(module)
-      .then((shader) => {
-        withAbort(() => setShader(shader), abortController);
-      })
-      .catch((error) => {
-        withAbort(() => setError(error.message), abortController);
-        setError(error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-
-    return () => {
-      abortController.abort();
-    };
-  }, [module]);
-
-  return {
-    error,
-    loading,
-    shader,
-  };
+  return useAtomValue(shaderFamily(module));
 }
 
 /**
- * Compose a shader module tree into its final shader, ready for consumption.
- * Dependencies are resolved using a DFS algortihm and then appended to the
- * shader string in preserved order.
- * @param tree shader module
- */
-async function composeShader(tree: ShaderModule) {
-  const resolved = dfsSort(tree);
-
-  const loadedModules = await Promise.all(
-    resolved.map(({ module }) => loadShaderModule(module))
-  );
-
-  return loadedModules.join('\n');
-}
-
-/**
- * Load a shader module asset from file or cache.
+ * Convenience hook to resolve and compile a shader as a Skia runtime effect.
  * @param module shader module
  */
-async function loadShaderModule(module: number) {
-  if (shaderCache.has(module)) {
-    return shaderCache.get(module)!;
-  }
+export function useSkShader(module: ShaderModule) {
+  const shader = useShader(module);
+  const skShader = useMemo(
+    () =>
+      shader.state === 'hasData' ? Skia.RuntimeEffect.Make(shader.data) : null,
+    [shader]
+  );
 
-  if (!module) {
-    throw new Error(`Shader module not found: ${module}`);
-  }
-
-  const file = await Asset.fromModule(module).downloadAsync();
-
-  if (!file.localUri) {
-    throw new Error(`Failed to load shader file: ${file.name}`);
-  }
-
-  const shader = await new File(file.localUri).text();
-
-  shaderCache.set(module, shader);
-
-  return shader;
+  return {
+    error: shader.state === 'hasError' ? shader.error : null,
+    loading: shader.state === 'loading',
+    shader: skShader,
+  };
 }
