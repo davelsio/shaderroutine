@@ -22,8 +22,8 @@ export function TypeGpu() {
         .createPipeline();
 
       // Animation loop
-      return ({ delta, time }) => {
-        uniforms.time.write(time);
+      return ({ elapsed }) => {
+        uniforms.time.write(elapsed);
 
         pipeline
           .withColorAttachment({

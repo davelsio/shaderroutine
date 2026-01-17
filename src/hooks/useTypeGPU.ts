@@ -19,6 +19,10 @@ type RenderArgs = {
   /**
    * Total time elapsed in seconds.
    */
+  elapsed: number;
+  /**
+   * Elapsed simulation time in seconds, adjusted for lag smoothing.
+   */
   time: number;
 };
 
@@ -27,14 +31,14 @@ type RenderCallback = (args: RenderArgs) => void;
 type TgpuCallback = (props: RenderProps) => RenderCallback;
 type TgpuOptions = {
   /**
-   * Delta time threshold in milliseconds at which frame normalization occurs.
+   * Delta time threshold in milliseconds at which frame rate adjustment occurs.
    * Set this to prevent physics sim explosions due to frame drops.
    *
    * @default 0.1 // 100ms
    */
   lagThreshold?: number;
   /**
-   * Maximum delta step. Delta normalization value to use if `lagThreshold` is
+   * Maximum delta step. Delta adjusted value to use if `lagThreshold` is
    * reached.
    *
    * @default 1 / 30 // ~30fps
@@ -80,6 +84,7 @@ export function useTypeGPU(tgpuCallback: TgpuCallback, options?: TgpuOptions) {
 
     let animationId: number;
     let prev = 0;
+    let simTime = 0;
 
     const { lagThreshold, maxDelta } = Object.assign(
       {},
@@ -95,7 +100,9 @@ export function useTypeGPU(tgpuCallback: TgpuCallback, options?: TgpuOptions) {
         dt = Math.min(dt, maxDelta);
       }
 
-      renderCb({ delta: dt, time: ts });
+      simTime += dt;
+
+      renderCb({ delta: dt, elapsed: ts, time: simTime });
       context.present();
       animationId = requestAnimationFrame(render);
     };
