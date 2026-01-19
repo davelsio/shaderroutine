@@ -5,11 +5,13 @@
 // https://iquilezles.org/
 //
 // https://www.shadertoy.com/view/Xsl3Dl
-vec3 hash3d( vec3 p ) // replace this by something better
+vec3 hash3d( vec3 p )
 {
-	p = vec3( dot(p,vec3(127.1,311.7, 74.7)),
-            dot(p,vec3(269.5,183.3,246.1)),
-            dot(p,vec3(113.5,271.9,124.6)));
+	vec3 v = vec3(
+    dot(p,vec3(127.1,311.7, 74.7)),
+    dot(p,vec3(269.5,183.3,246.1)),
+    dot(p,vec3(113.5,271.9,124.6))
+  );
 
-	return -1.0 + 2.0*fract(sin(p)*43758.5453123);
+	return -1.0 + 2.0*fract(sin(v)*43758.5453123);
 }
