@@ -22,9 +22,9 @@ import { useUnistyles } from 'react-native-unistyles';
 import { CircularSlider } from '@components/CircularSlider';
 import { useImages } from '@hooks/useImages';
 import { useSkShader } from '@hooks/useShader';
-import { fbm } from '@shaders/fbm';
+import { fbm } from '@shaders/fbm/fbm.module';
 import type { ShaderModule } from '@shaders/modules';
-import { sdfCircle } from '@shaders/sdfCircle';
+import { sdfCircle } from '@shaders/sdfCircle/sdfCircle.module';
 import { loopBackward, loopForward } from '@utils/loopValue';
 
 import styles from './Reveal.styles';

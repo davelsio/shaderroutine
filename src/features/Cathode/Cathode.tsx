@@ -12,7 +12,7 @@ import { useUnistyles } from 'react-native-unistyles';
 
 import { useSkShader } from '@hooks/useShader';
 import type { ShaderModule } from '@shaders/modules';
-import { remap } from '@shaders/remap';
+import { remap } from '@shaders/remap/remap.module';
 
 import styles from './Cathode.styles';
 

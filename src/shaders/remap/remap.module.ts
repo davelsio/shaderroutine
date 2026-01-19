@@ -1,4 +1,4 @@
-import { inverseLerp } from '../inverseLerp';
+import { inverseLerp } from '../inverseLerp/inverseLerp.module';
 import type { ShaderModule } from '../modules';
 
 export const remap: ShaderModule = {

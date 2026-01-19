@@ -30,10 +30,9 @@ import { useUnistyles } from 'react-native-unistyles';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { useSkShader } from '@hooks/useShader';
-
-import type { ShaderModule } from '../../shaders/modules';
-import { remap } from '../../shaders/remap';
-import springEasings from '../../utils/springEasings';
+import type { ShaderModule } from '@shaders/modules';
+import { remap } from '@shaders/remap/remap.module';
+import springEasings from '@utils/springEasings';
 
 import styles from './Sun.styles';
 import { DEFAULT_PRESETS, type PresetName, useSunState } from './SunState';
