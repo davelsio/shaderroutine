@@ -1,5 +1,4 @@
-import { useClock } from '@shopify/react-native-skia';
-import { CanvasRef, RNCanvasContext, useDevice } from 'react-native-wgpu';
+import { CanvasRef, type RNCanvasContext, useDevice } from 'react-native-wgpu';
 import { tgpu, type TgpuRoot } from 'typegpu';
 
 interface RenderProps {
@@ -52,7 +51,6 @@ const defaultOptions: Required<TgpuOptions> = {
 };
 
 export function useTypeGPU(tgpuCallback: TgpuCallback, options?: TgpuOptions) {
-  const clock = useClock();
   const { device } = useDevice();
 
   const cbRef = (ref: CanvasRef | null) => {
@@ -91,8 +89,8 @@ export function useTypeGPU(tgpuCallback: TgpuCallback, options?: TgpuOptions) {
       options,
       defaultOptions
     );
-    const render = () => {
-      const ts = clock.value / 1000; // seconds
+    const render = (t: number) => {
+      const ts = t / 1000; // seconds
       let dt = ts - prev;
       prev = ts;
 
