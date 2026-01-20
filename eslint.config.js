@@ -30,27 +30,6 @@ module.exports = defineConfig([
       '@typescript-eslint': typescriptEslint,
     },
     rules: {
-      // https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/order.md
-      'import/order': [
-        'warn',
-        {
-          alphabetize: {
-            order: 'asc',
-            caseInsensitive: true,
-          },
-          distinctGroup: true,
-          groups: ['builtin', 'external', 'parent', 'sibling', 'index'],
-          'newlines-between': 'always',
-          pathGroups: [
-            {
-              pattern: '@*/**',
-              group: 'parent',
-              position: 'before',
-            },
-          ],
-        },
-      ],
-
       // Disable the array notation police
       '@typescript-eslint/array-type': 'off',
 
