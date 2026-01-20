@@ -2,7 +2,7 @@ import { Skia } from '@shopify/react-native-skia';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
-import { type ShaderModule, shaderFamily } from '@shaders/modules';
+import { shaderFamily, type ShaderModule } from '@shaders/modules';
 
 /**
  * Convenience hook to resolve the shader module tree into a single string.

@@ -6,12 +6,12 @@ import {
   Fill,
   ImageShader,
   Shader,
-  type SkColor,
   Skia,
-  type SkPoint,
   useClock,
   useImage,
   vec,
+  type SkColor,
+  type SkPoint,
 } from '@shopify/react-native-skia';
 import * as Haptics from 'expo-haptics';
 import { router, usePathname } from 'expo-router';
@@ -34,8 +34,9 @@ import type { ShaderModule } from '@shaders/modules';
 import { remap } from '@shaders/remap/remap.module';
 import springEasings from '@utils/springEasings';
 
+import { DEFAULT_PRESETS, useSunState, type PresetName } from './SunState';
+
 import styles from './Sun.styles';
-import { DEFAULT_PRESETS, type PresetName, useSunState } from './SunState';
 
 const AnimatedSegmentedControl =
   Animated.createAnimatedComponent(SegmentedControl);

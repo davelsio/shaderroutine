@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 import type {
+  ListRenderItem,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  ListRenderItem,
 } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import {
@@ -13,8 +13,9 @@ import {
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import styles, { ITEM_SIZE, ITEM_SPACING } from './CircularSlider.styles';
 import { CircularSliderItem } from './CircularSliderItem';
+
+import styles, { ITEM_SIZE, ITEM_SPACING } from './CircularSlider.styles';
 
 type CircularSliderProps = {
   images: string[];

@@ -12,9 +12,9 @@ import {
   PreviewLabel,
 } from '../../components/ColorPicker';
 import { Slider } from '../../components/Slider';
+import { useSunState, type SunPreset } from './SunState';
 
 import styles from './Sun.styles';
-import { type SunPreset, useSunState } from './SunState';
 
 export function SunControlsView() {
   const state = useSunState();

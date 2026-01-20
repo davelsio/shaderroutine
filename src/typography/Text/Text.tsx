@@ -6,7 +6,8 @@ import { FontFamily } from '../../theme/vars/fonts';
 import styles, { type TextOptions, type TextVariants } from './Text.styles';
 
 export interface TextProps<Family extends FontFamily>
-  extends ComponentPropsWithRef<typeof RNText>,
+  extends
+    ComponentPropsWithRef<typeof RNText>,
     RNTextProps,
     TextVariants,
     TextOptions<Family> {}

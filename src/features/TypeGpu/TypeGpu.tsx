@@ -7,8 +7,9 @@ import { Canvas } from 'react-native-wgpu';
 import { useTypeGPU } from '@hooks/useTypeGPU';
 
 import { createFragmentShader } from './TypeGpu.frag';
-import style from './TypeGpu.styles';
 import { mainVertex } from './TypeGpu.vert';
+
+import style from './TypeGpu.styles';
 
 export function TypeGpu() {
   const cbRef = useTypeGPU(

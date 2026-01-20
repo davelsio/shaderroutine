@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
-import { loadable } from 'jotai/utils';
 import { atomFamily } from 'jotai-family';
+import { loadable } from 'jotai/utils';
 
 import { loadShaderModule } from '@helpers/loadShaderModule';
 import { dfsSort } from '@utils/depthFirstSearch';

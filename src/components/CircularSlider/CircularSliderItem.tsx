@@ -3,8 +3,8 @@ import { Image } from 'react-native';
 import Animated, {
   interpolate,
   interpolateColor,
-  type SharedValue,
   useAnimatedStyle,
+  type SharedValue,
 } from 'react-native-reanimated';
 
 import styles, { ITEM_SIZE } from './CircularSlider.styles';
