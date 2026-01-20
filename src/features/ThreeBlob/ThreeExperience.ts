@@ -97,12 +97,12 @@ export const initExperience = (ref: CanvasRef | null) => {
     return;
   }
 
-  // Uniforms
+  // Uniforms ------------------------------------------------------------------
 
   time = tsl.uniform(0.0);
   vNormal = tsl.varying(tsl.vec3(), 'vNormal');
 
-  // Scene
+  // Scene ---------------------------------------------------------------------
 
   const { width, height } = context.canvas;
   const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
@@ -110,7 +110,7 @@ export const initExperience = (ref: CanvasRef | null) => {
 
   const scene = new THREE.Scene();
 
-  // Lighting
+  // Lighting ------------------------------------------------------------------
 
   const dirLight = new THREE.DirectionalLight(0xffffff, 4.0);
   dirLight.position.set(10, 10, 10);
@@ -119,23 +119,23 @@ export const initExperience = (ref: CanvasRef | null) => {
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
   scene.add(ambientLight);
 
-  // Background
+  // Background ----------------------------------------------------------------
 
   const backgroundGeometry = new THREE.SphereGeometry(4, 16, 16);
   const backgroundMaterial = new THREE.MeshBasicNodeMaterial({
     side: THREE.BackSide,
     colorNode: colorNode(),
-    // colorNode: tsl.toTSL(colorNodeTgpu),
+    // colorNode: t3.toTSL(colorNodeTgpu),
   });
   const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
   scene.add(background);
 
-  // Sphere
+  // Sphere --------------------------------------------------------------------
 
   const sphereGeometry = new THREE.SphereGeometry(1.0, 256);
   const sphereMaterial = new THREE.MeshPhongNodeMaterial({
     color: 'white',
-    // emissive: new THREE.Color(0xffffff).multiplyScalar(0.25),
+    emissive: new THREE.Color(0xffffff).multiplyScalar(0.1),
     shininess: 400,
     normalNode: normalNode(),
     positionNode: positionNode(),
@@ -143,7 +143,7 @@ export const initExperience = (ref: CanvasRef | null) => {
   const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
   scene.add(sphere);
 
-  // Renderer
+  // Renderer ------------------------------------------------------------------
 
   const renderer = makeWebGPURenderer(context, {
     antialias: true,
@@ -156,7 +156,7 @@ export const initExperience = (ref: CanvasRef | null) => {
     context.present();
   });
 
-  // Cleanup
+  // Cleanup -------------------------------------------------------------------
 
   return () => {
     renderer.setAnimationLoop(null);
