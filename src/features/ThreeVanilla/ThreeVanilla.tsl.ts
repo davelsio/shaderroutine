@@ -15,7 +15,7 @@ import { noise3d } from '@shaders/noise3d/noise3d.tsl';
 let time: THREE.UniformNode<number>;
 let vNormal: THREE.VaryingNode;
 
-// Compute Shaders -------------------------------------------------------------
+// Helpers -------------------------------------------------------------
 
 const orthogonal = tsl.Fn(() => {
   const pos = tsl.normalLocal;
@@ -37,7 +37,7 @@ const updatePosition = tsl.Fn(
   }
 );
 
-// Shader Nodes ----------------------------------------------------------------
+// Nodes ----------------------------------------------------------------
 
 const colorNode = tsl.Fn(() => {
   const color1 = tsl.vec3(0.01, 0.22, 0.98);
