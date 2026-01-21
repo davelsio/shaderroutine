@@ -135,7 +135,7 @@ export const initExperience = (ref: CanvasRef | null) => {
   const sphereGeometry = new THREE.SphereGeometry(1.0, 256);
   const sphereMaterial = new THREE.MeshPhongNodeMaterial({
     color: 'white',
-    emissive: new THREE.Color(0xffffff).multiplyScalar(0.1),
+    emissive: new THREE.Color(0xffffff).multiplyScalar(0.25),
     shininess: 400,
     normalNode: normalNode(),
     positionNode: positionNode(),
