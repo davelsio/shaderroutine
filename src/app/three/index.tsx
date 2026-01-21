@@ -1,4 +1,4 @@
-import { ThreeVanilla } from '@features/ThreeVanilla/ThreeVanilla';
+import { ThreeVanilla } from '@features/ThreeVanilla';
 
 export default function ThreeScreen() {
   return <ThreeVanilla />;
