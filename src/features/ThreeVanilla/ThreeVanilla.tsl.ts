@@ -19,15 +19,11 @@ let vNormal: THREE.VaryingNode;
 
 const orthogonal = tsl.Fn(() => {
   const pos = tsl.normalLocal;
-  const result = tsl.vec3();
-  tsl
-    .If(tsl.abs(pos.x).greaterThan(tsl.abs(pos.z)), () => {
-      result.assign(tsl.normalize(tsl.vec3(tsl.negate(pos.y), pos.x, 0.0)));
-    })
-    .Else(() => {
-      result.assign(tsl.normalize(tsl.vec3(0.0, tsl.negate(pos.z), pos.y)));
-    });
-  return result;
+  return tsl.select(
+    tsl.abs(pos.x).greaterThan(tsl.abs(pos.z)),
+    tsl.vec3(tsl.normalize(tsl.vec3(tsl.negate(pos.y), pos.x, 0.0))),
+    tsl.vec3(tsl.normalize(tsl.vec3(0.0, tsl.negate(pos.z), pos.y)))
+  );
 });
 
 const updatePosition = tsl.Fn(
@@ -45,14 +41,6 @@ const colorNode = tsl.Fn(() => {
   const t = tsl.clamp(tsl.length(tsl.abs(tsl.uv().sub(0.5))), 0.0, 0.8);
   return tsl.mix(color1, color2, t);
 });
-
-// const colorNodeTgpu = () => {
-//   'use gpu';
-//   const color1 = d.vec3f(0.01, 0.22, 0.98);
-//   const color2 = d.vec3f(0.36, 0.68, 1.0);
-//   const t = std.clamp(std.length(std.abs(t3.uv().$.sub(0.5))), 0.0, 0.8);
-//   return d.vec4f(std.mix(color1, color2, t), 1.0);
-// }
 
 const normalNode = tsl.Fn(() => {
   const normal = vNormal;
