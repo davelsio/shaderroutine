@@ -12,17 +12,15 @@ import { noise3d } from '@shaders/noise3d/noise3d.tsl';
 
 // Uniforms --------------------------------------------------------------------
 
-let time: THREE.UniformNode<number>;
 let vNormal: THREE.VaryingNode;
 
 // Helpers -------------------------------------------------------------
 
-const orthogonal = tsl.Fn(() => {
-  const pos = tsl.normalLocal;
+const orthogonal = tsl.Fn(([normal]: [THREE.ConstNode<THREE.Vector3>]) => {
   return tsl.select(
-    tsl.abs(pos.x).greaterThan(tsl.abs(pos.z)),
-    tsl.vec3(tsl.normalize(tsl.vec3(tsl.negate(pos.y), pos.x, 0.0))),
-    tsl.vec3(tsl.normalize(tsl.vec3(0.0, tsl.negate(pos.z), pos.y)))
+    tsl.abs(normal.x).greaterThan(tsl.abs(normal.z)),
+    tsl.vec3(tsl.normalize(tsl.vec3(tsl.negate(normal.y), normal.x, 0.0))),
+    tsl.vec3(tsl.normalize(tsl.vec3(0.0, tsl.negate(normal.z), normal.y)))
   );
 });
 
@@ -49,18 +47,19 @@ const normalNode = tsl.Fn(() => {
 
 const positionNode = tsl.Fn(() => {
   const pos = tsl.positionLocal;
+  const normalLocal = tsl.normalLocal;
 
-  const updatedPos = updatePosition(pos, time);
+  const updatedPos = updatePosition(pos, tsl.time);
   const theta = tsl.float(0.001);
 
-  const vecTangent = orthogonal();
-  const vecBiTangent = tsl.normalize(tsl.cross(tsl.normalLocal, vecTangent));
+  const vecTangent = orthogonal(normalLocal);
+  const vecBiTangent = tsl.normalize(tsl.cross(normalLocal, vecTangent));
 
   const neighbour1 = pos.add(vecTangent.mul(theta));
   const neighbour2 = pos.add(vecBiTangent.mul(theta));
 
-  const displacedNeighbour1 = updatePosition(neighbour1, time);
-  const displacedNeighbour2 = updatePosition(neighbour2, time);
+  const displacedNeighbour1 = updatePosition(neighbour1, tsl.time);
+  const displacedNeighbour2 = updatePosition(neighbour2, tsl.time);
 
   const displacedTangent = displacedNeighbour1.sub(updatedPos);
   const displacedBitangent = displacedNeighbour2.sub(updatedPos);
@@ -87,7 +86,6 @@ export const initExperience = (ref: CanvasRef | null) => {
 
   // Uniforms ------------------------------------------------------------------
 
-  time = tsl.uniform(0.0);
   vNormal = tsl.varying(tsl.vec3(), 'vNormal');
 
   // Scene ---------------------------------------------------------------------
@@ -109,7 +107,7 @@ export const initExperience = (ref: CanvasRef | null) => {
 
   // Background ----------------------------------------------------------------
 
-  const backgroundGeometry = new THREE.SphereGeometry(4, 16, 16);
+  const backgroundGeometry = new THREE.SphereGeometry(4, 32, 32);
   const backgroundMaterial = new THREE.MeshBasicNodeMaterial({
     side: THREE.BackSide,
     colorNode: colorNode(),
@@ -120,7 +118,7 @@ export const initExperience = (ref: CanvasRef | null) => {
 
   // Sphere --------------------------------------------------------------------
 
-  const sphereGeometry = new THREE.SphereGeometry(1.0, 256);
+  const sphereGeometry = new THREE.IcosahedronGeometry(1.0, 50);
   const sphereMaterial = new THREE.MeshPhongNodeMaterial({
     color: 'white',
     emissive: new THREE.Color(0xffffff).multiplyScalar(0.25),
@@ -138,8 +136,7 @@ export const initExperience = (ref: CanvasRef | null) => {
   });
   renderer.init();
 
-  renderer.setAnimationLoop((t) => {
-    time.value = t / 1000; // seconds
+  renderer.setAnimationLoop(() => {
     renderer.render(scene, camera);
     context.present();
   });
@@ -160,7 +157,6 @@ export const initExperience = (ref: CanvasRef | null) => {
 
     renderer.dispose();
 
-    time.dispose();
     vNormal.dispose();
   };
 };
