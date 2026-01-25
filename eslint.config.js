@@ -30,6 +30,9 @@ module.exports = defineConfig([
       '@typescript-eslint': typescriptEslint,
     },
     rules: {
+      // Disable unknown property warnings for R3F components
+      'react/no-unknown-property': 'off',
+
       // Disable the array notation police
       '@typescript-eslint/array-type': 'off',
 
