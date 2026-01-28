@@ -1,6 +1,6 @@
 /**
- * Blob example scene
- * Adapted from https://blog.maximeheckel.com/posts/field-guide-to-tsl-and-webgpu/
+ * Blob example scene. Adapted from:
+ * - https://blog.maximeheckel.com/posts/field-guide-to-tsl-and-webgpu/
  */
 
 import type { CanvasRef } from 'react-native-wgpu';
@@ -8,7 +8,7 @@ import * as tsl from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { makeWebGPURenderer } from '@helpers/makeWebGpuRenderer';
-import { noise3d } from '@shaders/noise3d/noise3d.tsl';
+import { simplexNoise4d } from '@shaders/noise/simplex4d.tsl';
 
 // Uniforms --------------------------------------------------------------------
 
@@ -24,12 +24,9 @@ const orthogonal = tsl.Fn(([normal]: [THREE.ConstNode<THREE.Vector3>]) => {
   );
 });
 
-const updatePosition = tsl.Fn(
-  ([pos, time]: [THREE.ConstNode<THREE.Vector3>, THREE.ConstNode<number>]) => {
-    const noise = noise3d(tsl.vec3(pos).add(tsl.vec3(time))).mul(0.2);
-    return tsl.add(pos, noise);
-  }
-);
+const getDisplacement = tsl.Fn(([pos]: [THREE.ConstNode<THREE.Vector3>]) => {
+  return simplexNoise4d(tsl.vec4(pos.mul(0.5), tsl.time.mul(0.5))).mul(0.5);
+});
 
 // Nodes ----------------------------------------------------------------
 
@@ -46,33 +43,37 @@ const normalNode = tsl.Fn(() => {
 });
 
 const positionNode = tsl.Fn(() => {
-  const pos = tsl.positionLocal;
-  const normalLocal = tsl.normalLocal;
+  const position = tsl.positionLocal;
+  const normal = tsl.normalLocal;
+  const tangent = orthogonal(normal);
+  const biTangent = tsl.normalize(tsl.cross(normal, tangent));
+  const theta = tsl.float(0.01);
 
-  const updatedPos = updatePosition(pos, tsl.time);
-  const theta = tsl.float(0.001);
+  const noise = getDisplacement(position).mul(normal);
+  const updatedPosition = position.add(noise);
 
-  const vecTangent = orthogonal(normalLocal);
-  const vecBiTangent = tsl.normalize(tsl.cross(normalLocal, vecTangent));
+  const n1Pos = position.add(tangent.mul(theta));
+  const n1Noise = getDisplacement(n1Pos).mul(normal);
+  const n1UpdatedPos = n1Pos.add(n1Noise);
 
-  const neighbour1 = pos.add(vecTangent.mul(theta));
-  const neighbour2 = pos.add(vecBiTangent.mul(theta));
+  const n2Pos = position.add(biTangent.mul(theta));
+  const n2Noise = getDisplacement(n2Pos).mul(normal);
+  const n2UpdatedPos = n2Pos.add(n2Noise);
 
-  const displacedNeighbour1 = updatePosition(neighbour1, tsl.time);
-  const displacedNeighbour2 = updatePosition(neighbour2, tsl.time);
+  const updatedTangent = tsl.normalize(n1UpdatedPos.sub(updatedPosition));
+  const updatedBitangent = tsl.normalize(n2UpdatedPos.sub(updatedPosition));
 
-  const displacedTangent = displacedNeighbour1.sub(updatedPos);
-  const displacedBitangent = displacedNeighbour2.sub(updatedPos);
+  let updatedNormal = tsl.cross(updatedTangent, updatedBitangent);
 
-  const normal = tsl.normalize(tsl.cross(displacedTangent, displacedBitangent));
+  updatedNormal = tsl.select(
+    updatedNormal.dot(normal).lessThan(0.0),
+    updatedNormal.negate(),
+    updatedNormal
+  ) as typeof updatedNormal;
 
-  const displacedNormal = normal
-    .dot(tsl.normalLocal)
-    .lessThan(0.0)
-    .select(normal.negate(), normal);
-  vNormal.assign(displacedNormal);
+  vNormal.assign(updatedNormal);
 
-  return updatedPos;
+  return updatedPosition;
 });
 
 // Experience ------------------------------------------------------------------
@@ -111,22 +112,20 @@ export const initExperience = (ref: CanvasRef | null) => {
   const backgroundMaterial = new THREE.MeshBasicNodeMaterial({
     side: THREE.BackSide,
     colorNode: colorNode(),
-    // colorNode: t3.toTSL(colorNodeTgpu),
   });
   const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
   scene.add(background);
 
   // Sphere --------------------------------------------------------------------
 
-  const sphereGeometry = new THREE.IcosahedronGeometry(1.0, 50);
+  const sphereGeometry = new THREE.IcosahedronGeometry(2.5, 64);
   const sphereMaterial = new THREE.MeshPhongNodeMaterial({
     color: 'white',
-    emissive: new THREE.Color(0xffffff).multiplyScalar(0.25),
-    shininess: 400,
     normalNode: normalNode(),
     positionNode: positionNode(),
   });
   const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  sphere.scale.set(0.5, 0.5, 0.5);
   scene.add(sphere);
 
   // Renderer ------------------------------------------------------------------
