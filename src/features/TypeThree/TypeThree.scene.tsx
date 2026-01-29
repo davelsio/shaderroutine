@@ -2,7 +2,13 @@ import * as t3 from '@typegpu/three';
 import * as TSL from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { blob, colorNode, normalNode, POSITION_STORAGE } from './TypeThree.tsl';
+import {
+  backgroundColorNode,
+  blob,
+  blobColorNode,
+  blobNormalNode,
+  POSITION_STORAGE,
+} from './TypeThree.tsl';
 
 export function TypeThreeScene() {
   return (
@@ -17,7 +23,7 @@ export function TypeThreeScene() {
         <meshBasicNodeMaterial
           args={[
             {
-              colorNode: t3.toTSL(colorNode),
+              colorNode: t3.toTSL(backgroundColorNode),
               side: THREE.BackSide,
             },
           ]}
@@ -30,10 +36,10 @@ export function TypeThreeScene() {
         <meshPhongNodeMaterial
           args={[
             {
-              color: '#ffffff',
+              colorNode: blobColorNode(),
               geometryNode: blob() as unknown as () => THREE.Node,
               positionNode: TSL.attribute(POSITION_STORAGE),
-              normalNode: normalNode(),
+              normalNode: blobNormalNode(),
             },
           ]}
         />

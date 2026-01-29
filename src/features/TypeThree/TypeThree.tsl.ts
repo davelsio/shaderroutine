@@ -10,11 +10,11 @@ import * as d from 'typegpu/data';
 import * as std from 'typegpu/std';
 
 import { simplexNoise4d } from '@shaders/noise/simplex4d.tgpu';
-
-// import { simplexNoise4d } from './Simplex4d.tgpu';
+import { remap } from '@shaders/remap/remap.gpu';
 
 // Constants -------------------------------------------------------------------
 
+export const NOISE_STORAGE = 'storageNoise';
 export const NORMAL_STORAGE = 'storageNormal';
 export const POSITION_STORAGE = 'storagePosition';
 
@@ -24,20 +24,35 @@ const uPositionFrequency = t3.uniform(0.5, d.f32);
 const uTimeFrequency = t3.uniform(0.4, d.f32);
 const uStrength = t3.uniform(0.3, d.f32);
 
+const uWarpedPositionFrequency = t3.uniform(0.38, d.f32);
+const uWarpedTimeFrequency = t3.uniform(0.12, d.f32);
+const uWarpedStrength = t3.uniform(1.7, d.f32);
+
 // Helpers ---------------------------------------------------------------------
 
-function getDisplacement(pos: d.v3f) {
+function getWarp(pos: d.v3f) {
   'use gpu';
+  const time = t3.time.$;
+
+  const warpedPosition = pos.add(
+    simplexNoise4d(
+      d.vec4f(
+        pos.mul(uWarpedPositionFrequency.$),
+        time * uWarpedTimeFrequency.$
+      )
+    ) * uWarpedStrength.$
+  );
+
   return (
     simplexNoise4d(
-      d.vec4f(pos.mul(uPositionFrequency.$), t3.time.$ * uTimeFrequency.$)
+      d.vec4f(warpedPosition.mul(uPositionFrequency.$), time * uTimeFrequency.$)
     ) * uStrength.$
   );
 }
 
 // Nodes -----------------------------------------------------------------------
 
-export function colorNode() {
+export function backgroundColorNode() {
   'use gpu';
   const color1 = d.vec3f(0.01, 0.22, 0.98);
   const color2 = d.vec3f(0.36, 0.68, 1.0);
@@ -45,7 +60,17 @@ export function colorNode() {
   return d.vec4f(std.mix(color1, color2, t), 1.0);
 }
 
-export const normalNode = TSL.Fn(() => {
+const BLUE = TSL.color('#0000ff');
+const RED = TSL.color('#ff0000');
+
+export const blobColorNode = TSL.Fn(() => {
+  const noise = TSL.attribute(NOISE_STORAGE, 'float');
+  const t = TSL.smoothstep(0.25, 1.0, noise);
+  // return TSL.vec4(TSL.vec3(t), 1.0);
+  return TSL.vec4(TSL.mix(BLUE, RED, t), 1.0);
+});
+
+export const blobNormalNode = TSL.Fn(() => {
   const normal = TSL.attribute(NORMAL_STORAGE, 'vec3');
   return TSL.transformNormalToView(normal);
 });
@@ -59,16 +84,15 @@ export const blob = TSL.Fn(({ renderer, geometry }) => {
   const normalAttr = _geometry.attributes.normal;
   const count = positionAttr.count;
 
-  // Tangent -------------------------------------------------------------------
+  // Noise ---------------------------------------------------------------------
 
-  // const tangentAccessor = t3.fromTSL(
-  //   TSL.storage(
-  //     geometry.attributes.tangent as THREE.BufferAttribute,
-  //     'vec4',
-  //     count
-  //   ),
-  //   d.arrayOf(d.vec4f)
-  // );
+  const noiseStorage = new THREE.StorageBufferAttribute(count, 1);
+  _geometry.setAttribute(NOISE_STORAGE, noiseStorage);
+
+  const noiseAccessor = t3.fromTSL(
+    TSL.storage(noiseStorage, 'float', count),
+    d.arrayOf(d.f32)
+  );
 
   // Normal --------------------------------------------------------------------
 
@@ -100,6 +124,17 @@ export const blob = TSL.Fn(({ renderer, geometry }) => {
     d.arrayOf(d.vec3f)
   );
 
+  // Tangent -------------------------------------------------------------------
+
+  // const tangentAccessor = t3.fromTSL(
+  //   TSL.storage(
+  //     geometry.attributes.tangent as THREE.BufferAttribute,
+  //     'vec4',
+  //     count
+  //   ),
+  //   d.arrayOf(d.vec4f)
+  // );
+
   // Compute -------------------------------------------------------------------
 
   const computeInit = t3
@@ -127,19 +162,26 @@ export const blob = TSL.Fn(({ renderer, geometry }) => {
       const biTangent = std.normalize(std.cross(normal, tangent));
       const theta = 0.001;
 
+      // Noise
+      const noise = getWarp(position);
+      // noiseAccessor.$[idx] = noise / uStrength.$;
+      // noiseAccessor.$[idx] = noise * 20.0;
+      // noiseAccessor.$[idx] = noise;
+      noiseAccessor.$[idx] = remap(noise / uStrength.$, -1.0, 1.0, 0.0, 1.0);
+
       // Position
-      const noise = normal.mul(getDisplacement(position));
-      const updatedPos = position.add(noise);
+      const displacement = normal.mul(noise);
+      const updatedPos = position.add(displacement);
       updatedPositionAccessor.$[idx] = d.vec3f(updatedPos);
 
       // Normal (neighbors technique)
       const n1Pos = position.add(tangent.mul(theta));
-      const n1Noise = normal.mul(getDisplacement(n1Pos));
-      const n1UpdatedPos = n1Pos.add(n1Noise);
+      const n1Displacement = normal.mul(getWarp(n1Pos));
+      const n1UpdatedPos = n1Pos.add(n1Displacement);
 
       const n2Pos = position.add(biTangent.mul(theta));
-      const n2Noise = normal.mul(getDisplacement(n2Pos));
-      const n2UpdatedPos = n2Pos.add(n2Noise);
+      const n2Displacement = normal.mul(getWarp(n2Pos));
+      const n2UpdatedPos = n2Pos.add(n2Displacement);
 
       const updatedTangent = std.normalize(n1UpdatedPos.sub(updatedPos));
       const updatedBitangent = std.normalize(n2UpdatedPos.sub(updatedPos));
