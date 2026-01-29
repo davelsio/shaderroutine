@@ -4,7 +4,7 @@
  * - https://threejs-journey.com/lessons/wobbly-sphere-shader
  */
 import * as t3 from '@typegpu/three';
-import * as TSL from 'three/tsl';
+import * as tsl from 'three/tsl';
 import * as THREE from 'three/webgpu';
 import * as d from 'typegpu/data';
 import * as std from 'typegpu/std';
@@ -69,24 +69,24 @@ export function blobMaterial(ref: THREE.MeshPhongNodeMaterial | null) {
 
   // Constants ----------------------------------------------------------------
 
-  const BLUE = TSL.color('#0000ff');
-  const RED = TSL.color('#ff0000');
+  const BLUE = tsl.color('#0000ff');
+  const RED = tsl.color('#ff0000');
 
   // Nodes ---------------------------------------------------------------------
 
-  const blobColorNode = TSL.Fn(() => {
-    const noise = TSL.attribute(NOISE_STORAGE, 'float');
-    const t = TSL.smoothstep(0.25, 1.0, noise);
+  const blobColorNode = tsl.Fn(() => {
+    const noise = tsl.attribute(NOISE_STORAGE, 'float');
+    const t = tsl.smoothstep(0.25, 1.0, noise);
     // return TSL.vec4(TSL.vec3(t), 1.0);
-    return TSL.vec4(TSL.mix(BLUE, RED, t), 1.0);
+    return tsl.vec4(tsl.mix(BLUE, RED, t), 1.0);
   });
 
-  const blobNormalNode = TSL.Fn(() => {
-    const normal = TSL.attribute(NORMAL_STORAGE, 'vec3');
-    return TSL.transformNormalToView(normal);
+  const blobNormalNode = tsl.Fn(() => {
+    const normal = tsl.attribute(NORMAL_STORAGE, 'vec3');
+    return tsl.transformNormalToView(normal);
   });
 
-  const blobGeometryNode = TSL.Fn(({ renderer, geometry }) => {
+  const blobGeometryNode = tsl.Fn(({ renderer, geometry }) => {
     const _geometry = geometry as THREE.BufferGeometry<
       // Infer the correct attributes type when calling TSL.storage
       Record<string, THREE.BufferAttribute>
@@ -101,7 +101,7 @@ export function blobMaterial(ref: THREE.MeshPhongNodeMaterial | null) {
     _geometry.setAttribute(NOISE_STORAGE, noiseStorage);
 
     const noiseAccessor = t3.fromTSL(
-      TSL.storage(noiseStorage, 'float', count),
+      tsl.storage(noiseStorage, 'float', count),
       d.arrayOf(d.f32)
     );
 
@@ -111,12 +111,12 @@ export function blobMaterial(ref: THREE.MeshPhongNodeMaterial | null) {
     _geometry.setAttribute(NORMAL_STORAGE, normalStorage);
 
     const normalAccessor = t3.fromTSL(
-      TSL.storage(normalAttr, 'vec3', count),
+      tsl.storage(normalAttr, 'vec3', count),
       d.arrayOf(d.vec3f)
     );
 
     const updatedNormalAccessor = t3.fromTSL(
-      TSL.storage(normalStorage, 'vec3', count),
+      tsl.storage(normalStorage, 'vec3', count),
       d.arrayOf(d.vec3f)
     );
 
@@ -126,12 +126,12 @@ export function blobMaterial(ref: THREE.MeshPhongNodeMaterial | null) {
     _geometry.setAttribute(POSITION_STORAGE, positionStorage);
 
     const positionAccesor = t3.fromTSL(
-      TSL.storage(positionAttr, 'vec3', count),
+      tsl.storage(positionAttr, 'vec3', count),
       d.arrayOf(d.vec3f)
     );
 
     const updatedPositionAccessor = t3.fromTSL(
-      TSL.storage(positionStorage, 'vec3', count),
+      tsl.storage(positionStorage, 'vec3', count),
       d.arrayOf(d.vec3f)
     );
 
@@ -217,7 +217,7 @@ export function blobMaterial(ref: THREE.MeshPhongNodeMaterial | null) {
 
   ref.colorNode = blobColorNode();
   ref.geometryNode = blobGeometryNode() as unknown as () => THREE.Node;
-  ref.positionNode = TSL.attribute(POSITION_STORAGE);
+  ref.positionNode = tsl.attribute(POSITION_STORAGE);
   ref.normalNode = blobNormalNode();
 
   // Cleanup -------------------------------------------------------------------
