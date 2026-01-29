@@ -1,7 +1,4 @@
-import * as t3 from '@typegpu/three';
-import * as THREE from 'three/webgpu';
-
-import { backgroundColorNode, blobMaterial } from './TypeThree.tsl';
+import { backgroundMaterial, blobMaterial } from './TypeThree.tsl';
 
 export function TypeThreeScene() {
   return (
@@ -13,14 +10,7 @@ export function TypeThreeScene() {
       {/* BACKGROUND */}
       <mesh>
         <sphereGeometry args={[4, 16, 16]} />
-        <meshBasicNodeMaterial
-          args={[
-            {
-              colorNode: t3.toTSL(backgroundColorNode),
-              side: THREE.BackSide,
-            },
-          ]}
-        />
+        <meshBasicNodeMaterial ref={backgroundMaterial} />
       </mesh>
 
       {/* SPHERE */}

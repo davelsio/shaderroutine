@@ -52,12 +52,21 @@ function getWarp(pos: d.v3f) {
 
 // Background ------------------------------------------------------------------
 
-export function backgroundColorNode() {
-  'use gpu';
-  const color1 = d.vec3f(0.01, 0.22, 0.98);
-  const color2 = d.vec3f(0.36, 0.68, 1.0);
-  const t = std.clamp(std.length(std.abs(t3.uv().$.sub(0.5))), 0.0, 0.8);
-  return d.vec4f(std.mix(color1, color2, t), 1.0);
+export function backgroundMaterial(ref: THREE.MeshBasicNodeMaterial | null) {
+  if (!ref) {
+    return;
+  }
+
+  const backgroundColorNode = t3.toTSL(() => {
+    'use gpu';
+    const color1 = d.vec3f(0.01, 0.22, 0.98);
+    const color2 = d.vec3f(0.36, 0.68, 1.0);
+    const t = std.clamp(std.length(std.abs(t3.uv().$.sub(0.5))), 0.0, 0.8);
+    return d.vec4f(std.mix(color1, color2, t), 1.0);
+  });
+
+  ref.colorNode = backgroundColorNode;
+  ref.side = THREE.BackSide;
 }
 
 // Sphere ----------------------------------------------------------------------
