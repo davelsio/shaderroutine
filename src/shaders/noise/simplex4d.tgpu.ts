@@ -10,30 +10,46 @@
 //               https://github.com/stegu/webgl-noise
 //
 
+import { tgpu } from 'typegpu';
 import * as d from 'typegpu/data';
 import * as std from 'typegpu/std';
 
-function permute_float(x: number): number {
+const permute_float = tgpu.fn(
+  [d.f32],
+  d.f32
+)((x) => {
   'use gpu';
   return std.floor(std.mod((x * 34.0 + 1.0) * x, 289.0));
-}
+});
 
-function permute_vec4(x: d.v4f): d.v4f {
+const permute_vec4 = tgpu.fn(
+  [d.vec4f],
+  d.vec4f
+)((x) => {
   'use gpu';
   return std.mod(x.mul(34.0).add(1.0).mul(x), 289.0);
-}
+});
 
-function taylorInvSqrt_float(r: number): number {
+const taylorInvSqrt_float = tgpu.fn(
+  [d.f32],
+  d.f32
+)((r) => {
   'use gpu';
   return 1.79284291400159 - 0.85373472095314 * r;
-}
+});
 
-function taylorInvSqrt_vec4(r: d.v4f): d.v4f {
+const taylorInvSqrt_vec4 = tgpu.fn(
+  [d.vec4f],
+  d.vec4f
+)((r) => {
   'use gpu';
   return std.sub(1.79284291400159, r.mul(0.85373472095314));
-}
+});
 
-function grad4(j: number, ip: d.v4f): d.v4f {
+const grad4 = tgpu.fn(
+  [d.f32, d.vec4f],
+  d.vec4f
+)((j, ip) => {
   'use gpu';
   const ones = d.vec4f(1.0, 1.0, 1.0, -1.0);
 
@@ -49,9 +65,12 @@ function grad4(j: number, ip: d.v4f): d.v4f {
   p_xyz = p.xyz.add(s.xyz.mul(2.0).sub(1.0).mul(s.www));
 
   return d.vec4f(p_xyz, p_w);
-}
+});
 
-export function simplexNoise4d(v: d.v4f): number {
+export const simplexNoise4d = tgpu.fn(
+  [d.vec4f],
+  d.f32
+)((v) => {
   'use gpu';
 
   const C = d.vec2f(
@@ -152,4 +171,4 @@ export function simplexNoise4d(v: d.v4f): number {
     ) +
       std.dot(m1.mul(m1), d.vec2f(std.dot(p3, x3), std.dot(p4, x4))))
   );
-}
+});
