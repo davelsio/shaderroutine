@@ -10,7 +10,7 @@ import * as THREE from 'three/webgpu';
 import { makeWebGPURenderer } from '@helpers/makeWebGpuRenderer';
 import { simplexNoise4d } from '@shaders/noise/simplex4d.tsl';
 
-// Uniforms --------------------------------------------------------------------
+// Variables --------------------------------------------------------------------
 
 let vNormal: THREE.VaryingNode;
 
@@ -85,7 +85,7 @@ export const initExperience = (ref: CanvasRef | null) => {
     return;
   }
 
-  // Uniforms ------------------------------------------------------------------
+  // Variables ------------------------------------------------------------------
 
   vNormal = tsl.varying(tsl.vec3(), 'vNormal');
 
