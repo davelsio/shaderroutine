@@ -1,0 +1,7 @@
+diff --git a/index.cjs b/index.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..ed39ab5dd7bed31b8c1e6e0a17dab2f5fe5aebf9
+--- /dev/null
++++ b/index.cjs
+@@ -0,0 +1 @@
++module.exports = require('./index.js');

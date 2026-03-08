@@ -1,3 +1,7 @@
 onlyBuiltDependencies:
   - '@shopify/react-native-skia'
   - unrs-resolver
+
+patchedDependencies:
+  tinyest-for-wgsl@0.3.1: patches/tinyest-for-wgsl@0.3.1.patch
+  tinyest@0.3.0: patches/tinyest@0.3.0.patch
