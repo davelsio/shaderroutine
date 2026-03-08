@@ -12,12 +12,6 @@ import * as std from 'typegpu/std';
 import { simplexNoise4d } from '@shaders/noise/simplex4d.tgpu';
 import { remap } from '@shaders/remap/remap.gpu';
 
-// Constants -------------------------------------------------------------------
-
-export const NOISE_STORAGE = 'storageNoise';
-export const NORMAL_STORAGE = 'storageNormal';
-export const POSITION_STORAGE = 'storagePosition';
-
 // Uniforms --------------------------------------------------------------------
 
 const uPositionFrequency = t3.uniform(0.5, d.f32);
@@ -27,6 +21,27 @@ const uStrength = t3.uniform(0.3, d.f32);
 const uWarpedPositionFrequency = t3.uniform(0.38, d.f32);
 const uWarpedTimeFrequency = t3.uniform(0.12, d.f32);
 const uWarpedStrength = t3.uniform(1.7, d.f32);
+
+// Constants
+
+const BLUE = t3.fromTSL(tsl.color('#0000ff'), d.vec3f);
+const RED = t3.fromTSL(tsl.color('#ff0000'), d.vec3f);
+
+// Variables & Accesors --------------------------------------------------------
+
+const vNormal = tsl.varying(tsl.vec3(), 'vNormal');
+const vNormalAcc = t3.fromTSL(vNormal, d.vec3f);
+
+const vNoise = tsl.varying(tsl.vec2(), 'vNoise'); // workaround read-only tgpu accesors
+const vNoiseAcc = t3.fromTSL(vNoise, d.vec2f);
+
+const normalLocal = t3.fromTSL(tsl.normalLocal, d.vec3f);
+const positionLocal = t3.fromTSL(tsl.positionLocal, d.vec3f);
+
+const transformedNormal = t3.fromTSL(
+  tsl.transformNormalToView(vNormal),
+  d.vec3f
+);
 
 // Helpers ---------------------------------------------------------------------
 
@@ -76,163 +91,74 @@ export function blobMaterial(ref: THREE.MeshPhongNodeMaterial | null) {
     return;
   }
 
-  // Constants ----------------------------------------------------------------
-
-  const BLUE = tsl.color('#0000ff');
-  const RED = tsl.color('#ff0000');
-
   // Nodes ---------------------------------------------------------------------
 
-  const blobColorNode = tsl.Fn(() => {
-    const noise = tsl.attribute(NOISE_STORAGE, 'float');
-    const t = tsl.smoothstep(0.25, 1.0, noise);
-    // return TSL.vec4(TSL.vec3(t), 1.0);
-    return tsl.vec4(tsl.mix(BLUE, RED, t), 1.0);
+  const colorNode = tsl.Fn(() => {
+    const t = tsl.smoothstep(0.25, 1.0, vNoise.x);
+    const mix = tsl.mix(BLUE.node, RED.node, t);
+    return tsl.vec4(mix, 1.0);
   });
 
-  const blobNormalNode = tsl.Fn(() => {
-    const normal = tsl.attribute(NORMAL_STORAGE, 'vec3');
-    return tsl.transformNormalToView(normal);
+  const normalNode = t3.toTSL(() => {
+    'use gpu';
+    return std.normalize(transformedNormal.$);
   });
 
-  const blobGeometryNode = tsl.Fn(({ renderer, geometry }) => {
-    const _geometry = geometry as THREE.BufferGeometry<
-      // Infer the correct attributes type when calling TSL.storage
-      Record<string, THREE.BufferAttribute>
-    >;
-    const positionAttr = _geometry.attributes.position;
-    const normalAttr = _geometry.attributes.normal;
-    const count = positionAttr.count;
+  const positionNode = t3.toTSL(() => {
+    'use gpu';
+    const position = positionLocal.$;
+    const normal = normalLocal.$;
+    const tangent = std.select(
+      std.normalize(d.vec3f(0.0, -normal.z, normal.y)),
+      std.normalize(d.vec3f(-normal.y, normal.x, 0.0)),
+      std.abs(normal.x) > std.abs(normal.z)
+    );
+    const biTangent = std.normalize(std.cross(normal, tangent));
+    const theta = 0.001;
 
-    // Noise ---------------------------------------------------------------------
+    // Noise
+    const noise = getWarp(position);
+    vNoiseAcc.$.x = remap(noise / uStrength.$, -1.0, 1.0, 0.0, 1.0);
 
-    const noiseStorage = new THREE.StorageBufferAttribute(count, 1);
-    _geometry.setAttribute(NOISE_STORAGE, noiseStorage);
+    // Position
+    const displacement = normal.mul(noise);
+    const updatedPos = position.add(displacement);
 
-    const noiseAccessor = t3.fromTSL(
-      tsl.storage(noiseStorage, 'float', count),
-      d.arrayOf(d.f32)
+    // Normal (neighbors technique)
+    const n1Pos = position.add(tangent.mul(theta));
+    const n1Displacement = normal.mul(getWarp(n1Pos));
+    const n1UpdatedPos = n1Pos.add(n1Displacement);
+
+    const n2Pos = position.add(biTangent.mul(theta));
+    const n2Displacement = normal.mul(getWarp(n2Pos));
+    const n2UpdatedPos = n2Pos.add(n2Displacement);
+
+    const updatedTangent = std.normalize(n1UpdatedPos.sub(updatedPos));
+    const updatedBitangent = std.normalize(n2UpdatedPos.sub(updatedPos));
+
+    let updatedNormal = std.cross(updatedTangent, updatedBitangent);
+
+    updatedNormal = std.select(
+      updatedNormal,
+      std.neg(updatedNormal),
+      std.dot(updatedNormal, normal) < 0.0
     );
 
-    // Normal --------------------------------------------------------------------
+    vNormalAcc.$.x = updatedNormal.x;
+    vNormalAcc.$.y = updatedNormal.y;
+    vNormalAcc.$.z = updatedNormal.z;
 
-    const normalStorage = new THREE.StorageBufferAttribute(count, 3);
-    _geometry.setAttribute(NORMAL_STORAGE, normalStorage);
-
-    const normalAccessor = t3.fromTSL(
-      tsl.storage(normalAttr, 'vec3', count),
-      d.arrayOf(d.vec3f)
-    );
-
-    const updatedNormalAccessor = t3.fromTSL(
-      tsl.storage(normalStorage, 'vec3', count),
-      d.arrayOf(d.vec3f)
-    );
-
-    // Position ------------------------------------------------------------------
-
-    const positionStorage = new THREE.StorageBufferAttribute(count, 3);
-    _geometry.setAttribute(POSITION_STORAGE, positionStorage);
-
-    const positionAccesor = t3.fromTSL(
-      tsl.storage(positionAttr, 'vec3', count),
-      d.arrayOf(d.vec3f)
-    );
-
-    const updatedPositionAccessor = t3.fromTSL(
-      tsl.storage(positionStorage, 'vec3', count),
-      d.arrayOf(d.vec3f)
-    );
-
-    // Tangent -------------------------------------------------------------------
-
-    // const tangentAccessor = t3.fromTSL(
-    //   TSL.storage(
-    //     geometry.attributes.tangent as THREE.BufferAttribute,
-    //     'vec4',
-    //     count
-    //   ),
-    //   d.arrayOf(d.vec4f)
-    // );
-
-    // Compute -------------------------------------------------------------------
-
-    const computeInit = t3
-      .toTSL(() => {
-        'use gpu';
-        const idx = t3.instanceIndex.$;
-        updatedNormalAccessor.$[idx] = normalAccessor.$[idx];
-        updatedPositionAccessor.$[idx] = positionAccesor.$[idx];
-      })
-      .compute(count)
-      .setName('Init Blob');
-
-    const computeUpdate = t3
-      .toTSL(() => {
-        'use gpu';
-        const idx = t3.instanceIndex.$;
-        const position = positionAccesor.$[idx];
-        const normal = normalAccessor.$[idx];
-        // const tangent = tangentAccessor.$[idx].xyz;
-        const tangent = std.select(
-          std.normalize(d.vec3f(0.0, -normal.z, normal.y)),
-          std.normalize(d.vec3f(-normal.y, normal.x, 0.0)),
-          std.abs(normal.x) > std.abs(normal.z)
-        );
-        const biTangent = std.normalize(std.cross(normal, tangent));
-        const theta = 0.001;
-
-        // Noise
-        const noise = getWarp(position);
-        // noiseAccessor.$[idx] = noise / uStrength.$;
-        // noiseAccessor.$[idx] = noise * 20.0;
-        // noiseAccessor.$[idx] = noise;
-        noiseAccessor.$[idx] = remap(noise / uStrength.$, -1.0, 1.0, 0.0, 1.0);
-
-        // Position
-        const displacement = normal.mul(noise);
-        const updatedPos = position.add(displacement);
-        updatedPositionAccessor.$[idx] = d.vec3f(updatedPos);
-
-        // Normal (neighbors technique)
-        const n1Pos = position.add(tangent.mul(theta));
-        const n1Displacement = normal.mul(getWarp(n1Pos));
-        const n1UpdatedPos = n1Pos.add(n1Displacement);
-
-        const n2Pos = position.add(biTangent.mul(theta));
-        const n2Displacement = normal.mul(getWarp(n2Pos));
-        const n2UpdatedPos = n2Pos.add(n2Displacement);
-
-        const updatedTangent = std.normalize(n1UpdatedPos.sub(updatedPos));
-        const updatedBitangent = std.normalize(n2UpdatedPos.sub(updatedPos));
-
-        let updatedNormal = std.cross(updatedTangent, updatedBitangent);
-
-        updatedNormal = std.select(
-          updatedNormal,
-          std.neg(updatedNormal),
-          std.dot(updatedNormal, normal) < 0.0
-        );
-
-        updatedNormalAccessor.$[idx] = d.vec3f(updatedNormal);
-      })
-      .compute(count)
-      .setName('Update Blob');
-
-    computeUpdate.onInit(() => renderer.compute(computeInit));
-
-    return computeUpdate;
+    return updatedPos;
   });
 
-  ref.colorNode = blobColorNode();
-  ref.geometryNode = blobGeometryNode() as unknown as () => THREE.Node;
-  ref.positionNode = tsl.attribute(POSITION_STORAGE);
-  ref.normalNode = blobNormalNode();
+  ref.colorNode = colorNode();
+  ref.positionNode = positionNode;
+  ref.normalNode = normalNode;
 
   // Cleanup -------------------------------------------------------------------
 
   return () => {
-    BLUE.dispose();
-    RED.dispose();
+    BLUE.node.dispose();
+    RED.node.dispose();
   };
 }
