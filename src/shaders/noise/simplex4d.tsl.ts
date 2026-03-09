@@ -15,45 +15,35 @@ import * as THREE from 'three/webgpu';
 import { ConstNode } from 'three/webgpu';
 
 const permute_float = /*@__PURE__*/ tsl.Fn(
-  ([x]: [ConstNode<number>]) => {
+  ([x]: [ConstNode<'float', number>]) => {
     return tsl.floor(tsl.mod(x.mul(34.0).add(1.0).mul(x), 289.0));
   },
   { x: 'float', return: 'float' }
 );
 
 const permute_vec4 = /*@__PURE__*/ tsl.Fn(
-  ([x]: [ConstNode<THREE.Vector4>]) => {
+  ([x]: [ConstNode<'vec4', THREE.Vector4>]) => {
     return tsl.mod(x.mul(34.0).add(1.0).mul(x), 289.0);
   },
   { x: 'vec4', return: 'vec4' }
 );
 
-const permute = /*@__PURE__*/ tsl.overloadingFn([
-  permute_vec4 as unknown as THREE.Node,
-  permute_float as unknown as THREE.Node,
-]);
-
 const taylorInvSqrt_float = /*@__PURE__*/ tsl.Fn(
-  ([r]: [ConstNode<number>]) => {
+  ([r]: [ConstNode<'float', number>]) => {
     return tsl.sub(1.79284291400159, tsl.mul(0.85373472095314, r));
   },
   { r: 'float', return: 'float' }
 );
 
 const taylorInvSqrt_vec4 = /*@__PURE__*/ tsl.Fn(
-  ([r]: [ConstNode<THREE.Vector4>]) => {
+  ([r]: [ConstNode<'vec4', THREE.Vector4>]) => {
     return tsl.sub(1.79284291400159, tsl.mul(0.85373472095314, r));
   },
   { r: 'vec4', return: 'vec4' }
 );
 
-const taylorInvSqrt = /*@__PURE__*/ tsl.overloadingFn([
-  taylorInvSqrt_vec4 as unknown as THREE.Node,
-  taylorInvSqrt_float as unknown as THREE.Node,
-]);
-
 const grad4 = /*@__PURE__*/ tsl.Fn(
-  ([j, ip]: [ConstNode<number>, ConstNode<THREE.Vector4>]) => {
+  ([j, ip]: [ConstNode<'float', number>, ConstNode<'vec4', THREE.Vector4>]) => {
     const ones = tsl.vec4(1.0, 1.0, 1.0, -1.0);
     const p = tsl.property('vec4');
     const s = tsl.property('vec4');
@@ -64,7 +54,14 @@ const grad4 = /*@__PURE__*/ tsl.Fn(
         .sub(1.0)
     );
     p.w.assign(tsl.sub(1.5, tsl.dot(tsl.abs(p.xyz), ones.xyz)));
-    s.assign(tsl.vec4(tsl.lessThan(p, tsl.vec4(0.0))));
+    s.assign(
+      tsl.vec4(
+        tsl.select(p.x.lessThan(0.0), 1.0, 0.0),
+        tsl.select(p.y.lessThan(0.0), 1.0, 0.0),
+        tsl.select(p.z.lessThan(0.0), 1.0, 0.0),
+        tsl.select(p.w.lessThan(0.0), 1.0, 0.0)
+      )
+    );
     p.xyz.assign(p.xyz.add(s.xyz.mul(2.0).sub(1.0).mul(s.www)));
 
     return p;
@@ -73,7 +70,7 @@ const grad4 = /*@__PURE__*/ tsl.Fn(
 );
 
 export const simplexNoise4d = /*@__PURE__*/ tsl.Fn(
-  ([v]: [ConstNode<THREE.Vector4>]) => {
+  ([v]: [ConstNode<'vec4', THREE.Vector4>]) => {
     const C = tsl.vec2(
       0.138196601125010504, // (5 - sqrt(5))/20  G4
       0.309016994374947451 // (sqrt(5) - 1)/4   F4
@@ -87,8 +84,16 @@ export const simplexNoise4d = /*@__PURE__*/ tsl.Fn(
 
     // Rank sorting originally contributed by Bill Licea-Kane, AMD (formerly ATI)
     const i0 = tsl.property('vec4');
-    const isX = tsl.step(x0.yzw, x0.xxx);
-    const isYZ = tsl.step(x0.zww, x0.yyz);
+    const isX = tsl.vec3(
+      tsl.step(x0.y, x0.x),
+      tsl.step(x0.z, x0.x),
+      tsl.step(x0.w, x0.x)
+    );
+    const isYZ = tsl.vec3(
+      tsl.step(x0.z, x0.y),
+      tsl.step(x0.w, x0.y),
+      tsl.step(x0.w, x0.z)
+    );
     //  i0.x = dot( isX, vec3( 1.0 ) );
     i0.x.assign(isX.x.add(isX.y).add(isX.z));
     i0.yzw.assign(tsl.sub(1.0, isX));
@@ -111,13 +116,15 @@ export const simplexNoise4d = /*@__PURE__*/ tsl.Fn(
 
     // Permutations
     i.assign(tsl.mod(i, 289.0));
-    const j0 = permute(
-      permute(permute(permute(i.w).add(i.z)).add(i.y)).add(i.x)
+    const j0 = permute_float(
+      permute_float(permute_float(permute_float(i.w).add(i.z)).add(i.y)).add(
+        i.x
+      )
     );
-    const j1 = permute(
-      permute(
-        permute(
-          permute(i.w.add(tsl.vec4(i1.w, i2.w, i3.w, 1.0)))
+    const j1 = permute_vec4(
+      permute_vec4(
+        permute_vec4(
+          permute_vec4(i.w.add(tsl.vec4(i1.w, i2.w, i3.w, 1.0)))
             .add(i.z)
             .add(tsl.vec4(i1.z, i2.z, i3.z, 1.0))
         )
@@ -139,7 +146,7 @@ export const simplexNoise4d = /*@__PURE__*/ tsl.Fn(
     const p4 = grad4(j1.w, ip);
 
     // Normalise gradients
-    const norm = taylorInvSqrt(
+    const norm = taylorInvSqrt_vec4(
       tsl.vec4(
         tsl.dot(p0, p0),
         tsl.dot(p1, p1),
@@ -151,7 +158,7 @@ export const simplexNoise4d = /*@__PURE__*/ tsl.Fn(
     p1.mulAssign(norm.y);
     p2.mulAssign(norm.z);
     p3.mulAssign(norm.w);
-    p4.mulAssign(taylorInvSqrt(tsl.dot(p4, p4)));
+    p4.mulAssign(taylorInvSqrt_float(tsl.dot(p4, p4)));
 
     // Mix contributions from the five corners
     const m0 = tsl.max(

@@ -65,7 +65,7 @@ export function backgroundMaterial(ref: THREE.MeshBasicNodeMaterial | null) {
     return d.vec4f(std.mix(color1, color2, t), 1.0);
   });
 
-  ref.colorNode = backgroundColorNode;
+  ref.colorNode = backgroundColorNode as THREE.Node<'vec4'>;
   ref.side = THREE.BackSide;
 }
 
@@ -84,7 +84,7 @@ export function blobMaterial(ref: THREE.MeshPhongNodeMaterial | null) {
   // Nodes ---------------------------------------------------------------------
 
   const blobColorNode = tsl.Fn(() => {
-    const noise = tsl.attribute(NOISE_STORAGE, 'float');
+    const noise = tsl.attribute<'float'>(NOISE_STORAGE, 'float');
     const t = tsl.smoothstep(0.25, 1.0, noise);
     // return TSL.vec4(TSL.vec3(t), 1.0);
     return tsl.vec4(tsl.mix(BLUE, RED, t), 1.0);
@@ -225,7 +225,7 @@ export function blobMaterial(ref: THREE.MeshPhongNodeMaterial | null) {
   });
 
   ref.colorNode = blobColorNode();
-  ref.geometryNode = blobGeometryNode() as unknown as () => THREE.Node;
+  ref.geometryNode = blobGeometryNode();
   ref.positionNode = tsl.attribute(POSITION_STORAGE);
   ref.normalNode = blobNormalNode();
 

@@ -80,7 +80,7 @@ export function backgroundMaterial(ref: THREE.MeshBasicNodeMaterial | null) {
     return d.vec4f(std.mix(color1, color2, t), 1.0);
   });
 
-  ref.colorNode = backgroundColorNode;
+  ref.colorNode = backgroundColorNode as THREE.Node<'vec4'>;
   ref.side = THREE.BackSide;
 }
 

@@ -9,7 +9,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: './src/assets/app/icon.png',
   scheme: 'com.davelsio.shaderroutine',
   userInterfaceStyle: 'automatic',
-  newArchEnabled: true,
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'com.davelsio.shaderroutine',

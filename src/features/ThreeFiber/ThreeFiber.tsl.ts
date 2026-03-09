@@ -11,7 +11,10 @@ import { noise3d } from '@shaders/noise3d/noise3d.tsl';
 // Helpers -------------------------------------------------------------
 
 export const updatePosition = tsl.Fn(
-  ([pos, time]: [THREE.ConstNode<THREE.Vector3>, THREE.ConstNode<number>]) => {
+  ([pos, time]: [
+    THREE.ConstNode<'vec3', THREE.Vector3>,
+    THREE.ConstNode<'float', number>,
+  ]) => {
     const noise = noise3d(tsl.vec3(pos).add(tsl.vec3(time))).mul(0.2);
     return tsl.add(pos, noise);
   }
