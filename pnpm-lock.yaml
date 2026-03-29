@@ -4,14 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  tinyest-for-wgsl@0.3.1:
-    hash: fd96c6a96c3c1bc8f6a1abd3f23de81e592850ff4c22cb855ac8c0746d389e6c
-    path: patches/tinyest-for-wgsl@0.3.1.patch
-  tinyest@0.3.0:
-    hash: fd96c6a96c3c1bc8f6a1abd3f23de81e592850ff4c22cb855ac8c0746d389e6c
-    path: patches/tinyest@0.3.0.patch
-
 importers:
 
   .:
@@ -219,8 +211,8 @@ importers:
         specifier: ~5.9.3
         version: 5.9.3
       unplugin-typegpu:
-        specifier: ^0.10.1
-        version: 0.10.1(typegpu@0.10.2)
+        specifier: ^0.10.2
+        version: 0.10.2(typegpu@0.10.2)
 
 packages:
 
@@ -743,8 +735,8 @@ packages:
     resolution: {integrity: sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/standalone@7.29.1':
-    resolution: {integrity: sha512-z42abD0C6fiHfgLyCWw8PYv6FCJ0IGVtSCxXk/NPykWO5LNIEGfdLDJ3HdYqlPcAhwtQ3oKH1PvNj2JGpTxQKg==}
+  '@babel/standalone@7.29.2':
+    resolution: {integrity: sha512-VSuvywmVRS8efooKrvJzs6BlVSxRvAdLeGrAKUrWoBx1fFBSeE/oBpUZCQ5BcprLyXy04W8skzz7JT8GqlNRJg==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.28.6':
@@ -4316,6 +4308,10 @@ packages:
     resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
     engines: {node: '>=12'}
 
+  picomatch@4.0.4:
+    resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
+    engines: {node: '>=12'}
+
   pirates@4.0.7:
     resolution: {integrity: sha512-TfySrs/5nm8fQJDcBDuUng3VOUKsd7S+zqvbOTiGXHfxX4wK31ard+hoNuvkicM/2YFzlpDgABOevKSsB4G/FA==}
     engines: {node: '>= 6'}
@@ -5046,12 +5042,16 @@ packages:
   throat@5.0.0:
     resolution: {integrity: sha512-fcwX4mndzpLQKBS1DVYhGAcYaYt7vsHNIvQV+WXMvnow5cgjPphq5CaayLaGsjRdSCKZFNGt7/GYAuXaNOiYCA==}
 
-  tinyest-for-wgsl@0.3.1:
-    resolution: {integrity: sha512-ftSG2BOHdCrSFgM5/iDmRpkOU8xCQmKA0k+Fg6MAQqTMwRxRX9Af8M4nnRXvkPGzUgWYNBxkt16FDkvcHHSO7g==}
+  tinyest-for-wgsl@0.3.2:
+    resolution: {integrity: sha512-Y5IBd0In6btjdJ3Tv0PTWeDajDc9Phwd8G/3gW3p3hbbr02JTkwqjvN9JeJsvuFmnmAStU+t05Zu/8Fl5oIOvw==}
     engines: {node: '>=12.20.0'}
 
   tinyest@0.3.0:
     resolution: {integrity: sha512-I32Y6BRhX/GqQ4dVerQq+TChr0R4sWY+2//LrUA/MzdlRbRkeCja1Dk8WBAktLYmbfKz3sSpxI3EEl+K30vhRQ==}
+    engines: {node: '>=12.20.0'}
+
+  tinyest@0.3.1:
+    resolution: {integrity: sha512-SJNnjbvTEo5VmIjsMYpUFL34b9RyaI382r1v7gyVXZpd4VnjIZKMrGk1mphXM4zkhrs3hZfO1Xwv63DoZX50yw==}
     engines: {node: '>=12.20.0'}
 
   tinyglobby@0.2.15:
@@ -5177,8 +5177,8 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
-  unplugin-typegpu@0.10.1:
-    resolution: {integrity: sha512-jkVTbo6hy9uOjttjzQTOR4y0t20y7suINYQV3BaG72cfRdOaV+QlKyAJuH2J7lCXox4nAQfgnCNAxQBrstZG1w==}
+  unplugin-typegpu@0.10.2:
+    resolution: {integrity: sha512-E+kWHyxuxuBbXElZWDjt0/nTHP+niDBvGYV/KGNr9yD9USD4+EZKSvPVmsFUI9K1ALtVG17s+qMWcPFsjoV2Yw==}
     peerDependencies:
       typegpu: ^0.10.2
 
@@ -6063,7 +6063,7 @@ snapshots:
 
   '@babel/runtime@7.28.6': {}
 
-  '@babel/standalone@7.29.1': {}
+  '@babel/standalone@7.29.2': {}
 
   '@babel/template@7.28.6':
     dependencies:
@@ -10787,6 +10787,8 @@ snapshots:
 
   picomatch@4.0.3: {}
 
+  picomatch@4.0.4: {}
+
   pirates@4.0.7: {}
 
   pkg-dir@4.2.0:
@@ -11576,11 +11578,13 @@ snapshots:
 
   throat@5.0.0: {}
 
-  tinyest-for-wgsl@0.3.1(patch_hash=fd96c6a96c3c1bc8f6a1abd3f23de81e592850ff4c22cb855ac8c0746d389e6c):
+  tinyest-for-wgsl@0.3.2:
     dependencies:
-      tinyest: 0.3.0(patch_hash=fd96c6a96c3c1bc8f6a1abd3f23de81e592850ff4c22cb855ac8c0746d389e6c)
+      tinyest: 0.3.1
 
-  tinyest@0.3.0(patch_hash=fd96c6a96c3c1bc8f6a1abd3f23de81e592850ff4c22cb855ac8c0746d389e6c): {}
+  tinyest@0.3.0: {}
+
+  tinyest@0.3.1: {}
 
   tinyglobby@0.2.15:
     dependencies:
@@ -11675,7 +11679,7 @@ snapshots:
 
   typegpu@0.10.2:
     dependencies:
-      tinyest: 0.3.0(patch_hash=fd96c6a96c3c1bc8f6a1abd3f23de81e592850ff4c22cb855ac8c0746d389e6c)
+      tinyest: 0.3.0
       tsover-runtime: 0.0.5
       typed-binary: 4.3.2
 
@@ -11707,16 +11711,16 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unplugin-typegpu@0.10.1(typegpu@0.10.2):
+  unplugin-typegpu@0.10.2(typegpu@0.10.2):
     dependencies:
-      '@babel/standalone': 7.29.1
+      '@babel/standalone': 7.29.2
       defu: 6.1.4
       estree-walker: 3.0.3
       magic-string-ast: 1.0.3
       pathe: 2.0.3
-      picomatch: 4.0.3
-      tinyest: 0.3.0(patch_hash=fd96c6a96c3c1bc8f6a1abd3f23de81e592850ff4c22cb855ac8c0746d389e6c)
-      tinyest-for-wgsl: 0.3.1(patch_hash=fd96c6a96c3c1bc8f6a1abd3f23de81e592850ff4c22cb855ac8c0746d389e6c)
+      picomatch: 4.0.4
+      tinyest: 0.3.1
+      tinyest-for-wgsl: 0.3.2
       typegpu: 0.10.2
       unplugin: 2.3.11
 
@@ -11724,7 +11728,7 @@ snapshots:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       acorn: 8.16.0
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       webpack-virtual-modules: 0.6.2
 
   unrs-resolver@1.11.1:
