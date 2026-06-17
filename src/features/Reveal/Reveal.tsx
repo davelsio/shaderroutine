@@ -52,7 +52,7 @@ export function Reveal() {
   const { rt } = useUnistyles();
   const { error, loading, images } = useImages(imageURIs);
 
-  const { shader } = useSkShader(revealSkShader);
+  const shader = useSkShader(revealSkShader);
 
   const currIndex = useSharedValue(0);
   const nextIndex = useSharedValue(1);
@@ -169,14 +169,14 @@ export function Reveal() {
 
   if (error) return null;
   if (loading) return null;
-  if (!shader) return null;
+  if (shader.state !== 'success') return null;
 
   return (
     <GestureDetector gesture={gesture}>
       <View style={styles.container}>
         <Canvas style={styles.canvas}>
           <Fill>
-            <Shader source={shader} uniforms={uniforms}>
+            <Shader source={shader.data} uniforms={uniforms}>
               <ImageShader
                 image={image1}
                 fit="cover"

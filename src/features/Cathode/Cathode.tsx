@@ -29,21 +29,21 @@ export function CathodeView() {
   const clock = useClock();
   const image = useImage(imageURI);
 
-  const { shader } = useSkShader(cathodeSkShader);
+  const shader = useSkShader(cathodeSkShader);
 
   const uniforms = useDerivedValue(() => ({
     uResolution: vec(rt.screen.width, rt.screen.height),
     uTime: clock.value / 1000, // convert to seconds
   }));
 
-  if (!shader) {
+  if (shader.state !== 'success') {
     return null;
   }
 
   return (
     <Canvas style={styles.canvas}>
       <Fill>
-        <Shader source={shader} uniforms={uniforms}>
+        <Shader source={shader.data} uniforms={uniforms}>
           <ImageShader
             image={image}
             fit="cover"

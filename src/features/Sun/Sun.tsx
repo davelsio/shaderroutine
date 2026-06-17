@@ -108,7 +108,7 @@ export function SunView() {
 
   const surface = useImage(require('@assets/textures/sun.png'));
 
-  const { shader } = useSkShader(sunSkShader);
+  const shader = useSkShader(sunSkShader);
 
   const presetValues = useMemo(() => {
     const keys = Object.keys(DEFAULT_PRESETS);
@@ -153,7 +153,7 @@ export function SunView() {
     state.selectPreset(nativeEvent.value as PresetName);
   };
 
-  if (!shader) {
+  if (shader.state !== 'success') {
     return null;
   }
 
@@ -162,7 +162,7 @@ export function SunView() {
       <GestureDetector gesture={gesture}>
         <Canvas style={styles.canvas}>
           <Fill>
-            <Shader source={shader} uniforms={uniforms}>
+            <Shader source={shader.data} uniforms={uniforms}>
               <ImageShader
                 image={surface}
                 fit="fill"

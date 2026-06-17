@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai-family';
-import { loadable } from 'jotai/utils';
+import { unwrap } from 'jotai/utils';
 
 import { loadShaderModule } from '@helpers/loadShaderModule';
 import { dfsSort } from '@utils/depthFirstSearch';
@@ -9,6 +9,19 @@ export type ShaderModule = {
   module: number;
   dependencies?: ShaderModule[];
 };
+
+export type ShaderResult<Value> =
+  | {
+      state: 'loading';
+    }
+  | {
+      state: 'error';
+      error: unknown;
+    }
+  | {
+      state: 'success';
+      data: Value;
+    };
 
 /**
  * Jotai atom family of shaders.
@@ -42,5 +55,26 @@ export const shaderFamily = atomFamily((module: ShaderModule) => {
     return loadedModules.join('\n');
   });
 
-  return loadable(_atom);
+  return atom<ShaderResult<string>>((get) => {
+    let unwrapped: string | undefined;
+    try {
+      unwrapped = get(unwrap(_atom));
+    } catch (error) {
+      return {
+        state: 'error',
+        error: error,
+      };
+    }
+
+    if (unwrapped === undefined) {
+      return {
+        state: 'loading',
+      };
+    }
+
+    return {
+      state: 'success',
+      data: unwrapped,
+    };
+  });
 });

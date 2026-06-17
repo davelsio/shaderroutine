@@ -1,11 +1,15 @@
-import { Skia } from '@shopify/react-native-skia';
+import { Skia, SkRuntimeEffect } from '@shopify/react-native-skia';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
-import { shaderFamily, type ShaderModule } from '@shaders/modules';
+import {
+  shaderFamily,
+  ShaderResult,
+  type ShaderModule,
+} from '@shaders/modules';
 
 /**
- * Convenience hook to resolve the shader module tree into a single string.
+ * Resolve a shader module into a shader string.
  * @param module shader module
  */
 export function useShader(module: ShaderModule) {
@@ -13,20 +17,35 @@ export function useShader(module: ShaderModule) {
 }
 
 /**
- * Convenience hook to resolve and compile a shader as a Skia runtime effect.
+ * Resolve and compile a shader module as a Skia runtime effect.
  * @param module shader module
  */
 export function useSkShader(module: ShaderModule) {
   const shader = useShader(module);
-  const skShader = useMemo(
-    () =>
-      shader.state === 'hasData' ? Skia.RuntimeEffect.Make(shader.data) : null,
-    [shader]
-  );
+  return useMemo<ShaderResult<SkRuntimeEffect>>(() => {
+    if (shader.state !== 'success') {
+      return shader;
+    }
 
-  return {
-    error: shader.state === 'hasError' ? shader.error : null,
-    loading: shader.state === 'loading',
-    shader: skShader,
-  };
+    let skShader: SkRuntimeEffect | null = null;
+    let error: string = 'Error compiling the Skia shader';
+
+    try {
+      skShader = Skia.RuntimeEffect.Make(shader.data);
+    } catch (err) {
+      error = String(err instanceof Error ? err.message : String(err));
+    }
+
+    if (!skShader) {
+      return {
+        state: 'error',
+        error: error,
+      };
+    }
+
+    return {
+      ...shader,
+      data: skShader,
+    };
+  }, [shader]);
 }

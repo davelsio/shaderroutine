@@ -24,7 +24,7 @@ export function TorusView() {
   const { rt } = useUnistyles();
   const clock = useClock();
 
-  const { shader } = useSkShader(torusSkShader);
+  const shader = useSkShader(torusSkShader);
 
   const uRotation = useSharedValue(0.0);
 
@@ -52,7 +52,7 @@ export function TorusView() {
       uRotation.set(gestureContext.value + t * Math.PI);
     });
 
-  if (!shader) {
+  if (shader.state !== 'success') {
     return null;
   }
 
@@ -60,7 +60,7 @@ export function TorusView() {
     <GestureDetector gesture={gesture}>
       <Canvas style={styles.canvas}>
         <Fill>
-          <Shader source={shader} uniforms={uniforms} />
+          <Shader source={shader.data} uniforms={uniforms} />
         </Fill>
       </Canvas>
     </GestureDetector>
