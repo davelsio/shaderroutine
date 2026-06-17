@@ -1,11 +1,11 @@
-import { Skia, SkRuntimeEffect } from '@shopify/react-native-skia';
+import { Skia, type SkRuntimeEffect } from '@shopify/react-native-skia';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
 import {
   shaderFamily,
-  ShaderResult,
   type ShaderModule,
+  type ShaderResult,
 } from '@shaders/modules';
 
 /**
