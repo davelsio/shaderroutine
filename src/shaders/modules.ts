@@ -20,7 +20,7 @@ export type ShaderModule = {
  */
 export const shaderFamily = atomFamily((module: ShaderModule) => {
   const shaderCache = new Map<number, string>();
-  const resolved = dfsSort(module);
+  const resolved = dfsSort(module, 'dependencies');
 
   const _atom = atom(async () => {
     const loadedModules = await Promise.all(

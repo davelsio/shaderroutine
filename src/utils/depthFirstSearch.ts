@@ -1,17 +1,23 @@
-export type DfsNode<T> = {
-  dependencies?: T[];
+const DefaultKey = 'children' as const;
+type DefaultKey = typeof DefaultKey;
+
+export type DfsNode<T, K extends string = 'children'> = {
+  /**
+   * Child nodes connected via edges.
+   */
+  [P in K]?: T[];
 };
 
 /**
  * Traverses a tree data structure using a depth-first search algorithm.
- * @param node root node of the tree
- * @param visited set of visited nodes
- * @param cb callback function to be executed on each node
+ * @param root - root node of the tree
+ * @param onVisit - function to execute on visiting each node
+ * @param childKey - field containing child nodes
  */
-export function dfsTraverse<T extends DfsNode<T>>(
-  tree: T,
-  cb: (node: T) => void
-) {
+export function dfsTraverse<
+  T extends DfsNode<T, K>,
+  K extends string = DefaultKey,
+>(root: T, onVisit: (node: T) => void, childKey: K = 'children' as K) {
   const visited = new Set<T>();
 
   const traverse = (node: T) => {
@@ -21,23 +27,28 @@ export function dfsTraverse<T extends DfsNode<T>>(
 
     visited.add(node);
 
-    if (node.dependencies) {
-      node.dependencies.forEach((dep) => dfsTraverse(dep, cb));
+    const children = node[childKey];
+
+    if (children) {
+      children.forEach(traverse);
     }
 
-    cb(node);
+    onVisit(node);
   };
 
-  traverse(tree);
+  traverse(root);
 }
 
 /**
  * Sort a tree data structure using a depth-first search algorithm.
- * @param tree root node of the tree
- * @returns sorted array of nodes
+ * @param tree - root node of the tree
+ * @param childKey - field containing child nodes
  */
-export function dfsSort<T extends DfsNode<T>>(tree: T) {
+export function dfsSort<T extends DfsNode<T, K>, K extends string = DefaultKey>(
+  tree: T,
+  childKey: K = DefaultKey as K
+) {
   const resolved: T[] = [];
-  dfsTraverse(tree, (n) => resolved.push(n));
+  dfsTraverse(tree, (n) => resolved.push(n), childKey);
   return resolved;
 }
