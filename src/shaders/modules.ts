@@ -41,8 +41,9 @@ export const shaderFamily = atomFamily((module: ShaderModule) => {
   const _atom = atom(async () => {
     const loadedModules = await Promise.all(
       resolved.map(async ({ module }) => {
-        if (shaderCache.has(module)) {
-          return shaderCache.get(module)!;
+        const cached = shaderCache.get(module);
+        if (cached !== undefined) {
+          return cached;
         }
 
         const shader = await loadShaderModule(module);
