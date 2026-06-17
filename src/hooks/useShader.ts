@@ -28,18 +28,18 @@ export function useSkShader(module: ShaderModule) {
     }
 
     let skShader: SkRuntimeEffect | null = null;
-    let error: string = 'Error compiling the Skia shader';
+    let error: unknown;
 
     try {
       skShader = Skia.RuntimeEffect.Make(shader.data);
     } catch (err) {
-      error = String(err instanceof Error ? err.message : String(err));
+      error = err;
     }
 
     if (!skShader) {
       return {
         state: 'error',
-        error: error,
+        error: error ?? new Error('Error compiling the Skia shader'),
       };
     }
 
