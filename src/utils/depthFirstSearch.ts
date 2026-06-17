@@ -1,23 +1,56 @@
-const DefaultKey = 'children' as const;
-type DefaultKey = typeof DefaultKey;
-
-export type DfsNode<T, K extends string = 'children'> = {
+const DefaultChildrenKey = 'children' as const;
+type DefaultChildrenKey = typeof DefaultChildrenKey;
+type TypeWithChildren<T, K extends string> = T & {
   /**
-   * Child nodes connected via edges.
+   * Field containing child nodes.
+   * @default 'children'
+   */
+  childrenKey?: K;
+};
+
+export type DfsNode<T, K extends string = DefaultChildrenKey> = {
+  /**
+   * Child nodes.
    */
   [P in K]?: T[];
 };
 
+export interface TraverseOpts<T> {
+  /**
+   * Callback to execute after the node children have been resolved.
+   */
+  onResolved?: (node: T) => void;
+  /**
+   * Callback to execute when the node is first visited, but before resolving
+   * its children.
+   */
+  onVisit?: (node: T) => void;
+}
+
+export interface DfsSortOpts {
+  /**
+   * Node order used to build the sorted result.
+   * @default 'parents-first'
+   */
+  sortOrder?: 'parents-first' | 'children-first';
+}
+
 /**
  * Traverses a tree data structure using a depth-first search algorithm.
  * @param root - root node of the tree
- * @param onVisit - function to execute on visiting each node
- * @param childKey - field containing child nodes
+ * @param options - traverse options
  */
 export function dfsTraverse<
   T extends DfsNode<T, K>,
-  K extends string = DefaultKey,
->(root: T, onVisit: (node: T) => void, childKey: K = 'children' as K) {
+  K extends string = DefaultChildrenKey,
+>(
+  root: T,
+  {
+    childrenKey = DefaultChildrenKey as K,
+    onResolved,
+    onVisit,
+  }: TypeWithChildren<TraverseOpts<T>, K> = {}
+) {
   const visited = new Set<T>();
 
   const traverse = (node: T) => {
@@ -26,14 +59,15 @@ export function dfsTraverse<
     }
 
     visited.add(node);
+    onVisit?.(node);
 
-    const children = node[childKey];
+    const children = node[childrenKey];
 
     if (children) {
       children.forEach(traverse);
     }
 
-    onVisit(node);
+    onResolved?.(node);
   };
 
   traverse(root);
@@ -41,14 +75,29 @@ export function dfsTraverse<
 
 /**
  * Sort a tree data structure using a depth-first search algorithm.
+ *
  * @param tree - root node of the tree
- * @param childKey - field containing child nodes
+ * @param options - sort options
  */
-export function dfsSort<T extends DfsNode<T, K>, K extends string = DefaultKey>(
+export function dfsSort<
+  T extends DfsNode<T, K>,
+  K extends string = DefaultChildrenKey,
+>(
   tree: T,
-  childKey: K = DefaultKey as K
+  {
+    childrenKey = DefaultChildrenKey as K,
+    sortOrder = 'parents-first',
+  }: TypeWithChildren<DfsSortOpts, K> = {}
 ) {
   const resolved: T[] = [];
-  dfsTraverse(tree, (n) => resolved.push(n), childKey);
+
+  const collect: keyof TraverseOpts<T> =
+    sortOrder === 'parents-first' ? 'onVisit' : 'onResolved';
+
+  dfsTraverse(tree, {
+    [collect]: (n: T) => resolved.push(n),
+    childrenKey,
+  });
+
   return resolved;
 }
