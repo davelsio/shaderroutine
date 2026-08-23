@@ -10,13 +10,8 @@ import {
 } from '@react-three/fiber';
 import { useState } from 'react';
 import { PixelRatio, type StyleProp, type ViewStyle } from 'react-native';
-import { Canvas, NativeCanvas, type CanvasRef } from 'react-native-webgpu';
+import { Canvas, type CanvasRef, type NativeCanvas } from 'react-native-webgpu';
 import * as THREE from 'three/webgpu';
-
-import {
-  makeWebGPURenderer,
-  ReactNativeCanvas,
-} from '@helpers/makeWebGpuRenderer';
 
 interface FiberCanvasProps {
   children: React.ReactNode;
@@ -44,20 +39,12 @@ export function FiberCanvas({
 
     const pxRatio = Math.min(PixelRatio.get(), 2);
 
-    const canvas = new ReactNativeCanvas(
-      context.canvas as unknown as NativeCanvas
-    );
-    canvas.width = canvas.clientWidth * pxRatio;
-    canvas.height = canvas.clientHeight * pxRatio;
-    const size = {
-      top: 0,
-      left: 0,
-      width: canvas.clientWidth,
-      height: canvas.clientHeight,
-    };
-
-    const root = createRoot(canvas as unknown as HTMLCanvasElement);
-    const renderer = makeWebGPURenderer(context);
+    const canvas = context.canvas as GPUCanvasContext['canvas'] & NativeCanvas;
+    const root = createRoot(canvas);
+    const renderer = new THREE.WebGPURenderer({
+      canvas: canvas,
+      context: context,
+    });
 
     root.configure({
       dpr: pxRatio,
@@ -66,7 +53,12 @@ export function FiberCanvas({
       frameloop: 'always',
       gl: async () => renderer.init(),
       scene,
-      size,
+      size: {
+        top: 0,
+        left: 0,
+        width: canvas.clientWidth,
+        height: canvas.clientHeight,
+      },
       onCreated: (state) => {
         const renderFrame = state.gl.render.bind(state.gl);
         state.gl.render = (scene: THREE.Scene, camera: THREE.Camera) => {
@@ -79,7 +71,7 @@ export function FiberCanvas({
     root.render(children);
 
     return () => {
-      unmountComponentAtNode(canvas as unknown as HTMLCanvasElement);
+      unmountComponentAtNode(canvas);
     };
   };
 

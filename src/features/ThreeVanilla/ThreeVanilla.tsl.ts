@@ -7,7 +7,6 @@ import type { CanvasRef } from 'react-native-webgpu';
 import * as tsl from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
-import { makeWebGPURenderer } from '@helpers/makeWebGpuRenderer';
 import { simplexNoise4d } from '@shaders/noise/simplex4d.tsl';
 
 // Variables --------------------------------------------------------------------
@@ -85,7 +84,7 @@ const positionNode = tsl.Fn(() => {
 export const initExperience = (ref: CanvasRef | null) => {
   const context = ref?.getContext('webgpu');
 
-  if (!ref || !context) {
+  if (!context) {
     return;
   }
 
@@ -134,10 +133,11 @@ export const initExperience = (ref: CanvasRef | null) => {
 
   // Renderer ------------------------------------------------------------------
 
-  const renderer = makeWebGPURenderer(context, {
+  const renderer = new THREE.WebGPURenderer({
+    context: context,
+    canvas: context.canvas,
     antialias: true,
   });
-  renderer.init();
 
   renderer.setAnimationLoop(() => {
     renderer.render(scene, camera);
