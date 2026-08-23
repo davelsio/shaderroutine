@@ -37,13 +37,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-build-properties',
       {
         android: {
-          buildToolsVersion: '35.0.0',
-          compileSdkVersion: 35,
-          targetSdkVersion: 35,
+          buildToolsVersion: '36.0.0',
+          compileSdkVersion: 36,
+          targetSdkVersion: 36,
           reactNativeReleaseLevel: 'experimental',
         },
         ios: {
-          deploymentTarget: '16.0',
+          deploymentTarget: '16.4',
           reactNativeReleaseLevel: 'experimental',
         },
       },
@@ -62,6 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         ],
       },
     ],
+    'expo-image',
     'expo-router',
     [
       'expo-splash-screen',
