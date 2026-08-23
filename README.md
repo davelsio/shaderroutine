@@ -1,11 +1,11 @@
 <h1 align="center">Shader Routine</h1>
 <p align="center"><i>Isolated experiments with shaders in React Native</i></p>
 
-## Description
+### Description
 
 A bunch of experiments usings different kinds of shaders and techniques implemented in React Native.
 
-## Features
+### Features
 
 | Feature  | Link | Description |
 | ---      | ---  | ---         |
@@ -13,8 +13,6 @@ A bunch of experiments usings different kinds of shaders and techniques implemen
 | Sun      | [`./features/Sun/`](./src/features/Sun/) | Skia adaptation of the [main sequence star](https://www.shadertoy.com/view/4dXGR4) shader in [Shadertoy](https://www.shadertoy.com/). |
 | Torus    | [`./features/Torus/`](./src/features/Torus/) | Adaptation of [@baconbrix torus example](https://x.com/baconbrix/status/1924919835420504339) using Skia.|
 
-
-## Develop
 
 ### Stack
 
