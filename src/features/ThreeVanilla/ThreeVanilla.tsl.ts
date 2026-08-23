@@ -3,7 +3,7 @@
  * - https://blog.maximeheckel.com/posts/field-guide-to-tsl-and-webgpu/
  */
 
-import type { CanvasRef } from 'react-native-wgpu';
+import type { CanvasRef } from 'react-native-webgpu';
 import * as tsl from 'three/tsl';
 import * as THREE from 'three/webgpu';
 

@@ -2,7 +2,7 @@
  * Adapted from https://docs.swmansion.com/TypeGPU/examples/#example=rendering--caustics
  */
 
-import { Canvas } from 'react-native-wgpu';
+import { Canvas } from 'react-native-webgpu';
 
 import { useTypeGPU } from '@hooks/useTypeGPU';
 
@@ -17,10 +17,11 @@ export function TypeGpu() {
       const { mainFragment, uniforms } = createFragmentShader(root);
 
       // First render
-      const pipeline = root['~unstable']
-        .withVertex(mainVertex, {})
-        .withFragment(mainFragment, { format: presentationFormat })
-        .createPipeline();
+      const pipeline = root.createRenderPipeline({
+        vertex: mainVertex,
+        fragment: mainFragment,
+        targets: { format: presentationFormat },
+      });
 
       // Animation loop
       return ({ elapsed }) => {

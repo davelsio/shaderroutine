@@ -1,4 +1,4 @@
-import { ThemeProvider as RNThemeProvider } from '@react-navigation/native';
+import { ThemeProvider as RNThemeProvider } from 'expo-router/react-navigation';
 import { withUnistyles } from 'react-native-unistyles';
 
 export const ThemeProvider = withUnistyles(RNThemeProvider, (theme, rt) => ({

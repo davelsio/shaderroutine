@@ -1,4 +1,4 @@
-import { Canvas } from 'react-native-wgpu';
+import { Canvas } from 'react-native-webgpu';
 
 import { initExperience } from './ThreeVanilla.tsl';
 

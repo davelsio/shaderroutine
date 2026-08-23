@@ -39,6 +39,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         android: {
           buildToolsVersion: '36.0.0',
           compileSdkVersion: 36,
+          minSdkVersion: 26,
           targetSdkVersion: 36,
           reactNativeReleaseLevel: 'experimental',
         },
@@ -90,15 +91,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     'expo-web-browser',
-    [
-      'react-native-edge-to-edge',
-      {
-        android: {
-          parentTheme: 'Default',
-          enforceNavigationBarContrast: false,
-        },
-      },
-    ],
+    'react-native-webgpu',
   ],
   experiments: {
     typedRoutes: true,

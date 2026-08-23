@@ -1,4 +1,8 @@
-import { CanvasRef, useDevice, type RNCanvasContext } from 'react-native-wgpu';
+import {
+  CanvasRef,
+  useDevice,
+  type RNCanvasContext,
+} from 'react-native-webgpu';
 import { tgpu, type TgpuRoot } from 'typegpu';
 
 interface RenderProps {

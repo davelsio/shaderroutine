@@ -19,9 +19,9 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      ['react-native-unistyles/plugin', unistylesOptions],
       ['unplugin-typegpu/babel'],
       ['react-native-worklets/plugin', workletsPluginOptions],
+      ['react-native-unistyles/plugin', unistylesOptions],
     ],
   };
 };

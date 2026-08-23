@@ -10,7 +10,7 @@
  *
  * @see https://github.com/wcandillon/react-native-webgpu/blob/578ad989b4326724702b14245d5c82622849ee23/apps/example/src/ThreeJS/components/makeWebGPURenderer.ts#L1
  */
-import type { NativeCanvas } from 'react-native-wgpu';
+import type { NativeCanvas } from 'react-native-webgpu';
 import * as THREE from 'three/webgpu';
 
 export class ReactNativeCanvas {

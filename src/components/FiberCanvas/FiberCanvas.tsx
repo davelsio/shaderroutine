@@ -10,7 +10,7 @@ import {
 } from '@react-three/fiber';
 import { useState } from 'react';
 import { PixelRatio, type StyleProp, type ViewStyle } from 'react-native';
-import { Canvas, NativeCanvas, type CanvasRef } from 'react-native-wgpu';
+import { Canvas, NativeCanvas, type CanvasRef } from 'react-native-webgpu';
 import * as THREE from 'three/webgpu';
 
 import {
@@ -64,11 +64,10 @@ export function FiberCanvas({
       events,
       camera,
       frameloop: 'always',
-      gl: renderer,
+      gl: async () => renderer.init(),
       scene,
       size,
-      onCreated: async (state) => {
-        await (state.gl as unknown as THREE.WebGPURenderer).init();
+      onCreated: (state) => {
         const renderFrame = state.gl.render.bind(state.gl);
         state.gl.render = (scene: THREE.Scene, camera: THREE.Camera) => {
           renderFrame(scene, camera);
