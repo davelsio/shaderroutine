@@ -34,7 +34,7 @@ export type ShaderResult<Value> =
 export const shaderFamily = atomFamily((module: ShaderModule) => {
   const shaderCache = new Map<number, string>();
   const resolved = dfsSort(module, {
-    childrenKey: 'dependencies',
+    nodesKey: 'dependencies',
     sortOrder: 'children-first',
   });
 

@@ -1,14 +1,14 @@
-const DefaultChildrenKey = 'children' as const;
-type DefaultChildrenKey = typeof DefaultChildrenKey;
-type TypeWithChildren<T, K extends string> = T & {
+const DefaultNodesKey = 'nodes' as const;
+
+type TypeWithNodes<T, K extends string> = T & {
   /**
    * Field containing child nodes.
-   * @default 'children'
+   * @default 'nodes'
    */
-  childrenKey?: K;
+  nodesKey?: K;
 };
 
-export type DfsNode<T, K extends string = DefaultChildrenKey> = {
+export type DfsNode<T, K extends string = typeof DefaultNodesKey> = {
   /**
    * Child nodes.
    */
@@ -29,7 +29,7 @@ export interface TraverseOpts<T> {
 
 export interface DfsSortOpts {
   /**
-   * Node order used to build the sorted result.
+   * Order in which to build the sorted result.
    * @default 'parents-first'
    */
   sortOrder?: 'parents-first' | 'children-first';
@@ -42,14 +42,14 @@ export interface DfsSortOpts {
  */
 export function dfsTraverse<
   T extends DfsNode<T, K>,
-  K extends string = DefaultChildrenKey,
+  K extends string = typeof DefaultNodesKey,
 >(
   root: T,
   {
-    childrenKey = DefaultChildrenKey as K,
+    nodesKey = DefaultNodesKey as K,
     onResolved,
     onVisit,
-  }: TypeWithChildren<TraverseOpts<T>, K> = {}
+  }: TypeWithNodes<TraverseOpts<T>, K> = {}
 ) {
   const visited = new Set<T>();
 
@@ -61,7 +61,7 @@ export function dfsTraverse<
     visited.add(node);
     onVisit?.(node);
 
-    const children = node[childrenKey];
+    const children = node[nodesKey];
 
     if (children) {
       children.forEach(traverse);
@@ -81,13 +81,13 @@ export function dfsTraverse<
  */
 export function dfsSort<
   T extends DfsNode<T, K>,
-  K extends string = DefaultChildrenKey,
+  K extends string = typeof DefaultNodesKey,
 >(
   tree: T,
   {
-    childrenKey = DefaultChildrenKey as K,
+    nodesKey = DefaultNodesKey as K,
     sortOrder = 'parents-first',
-  }: TypeWithChildren<DfsSortOpts, K> = {}
+  }: TypeWithNodes<DfsSortOpts, K> = {}
 ) {
   const resolved: T[] = [];
 
@@ -96,7 +96,7 @@ export function dfsSort<
 
   dfsTraverse(tree, {
     [collect]: (n: T) => resolved.push(n),
-    childrenKey,
+    nodesKey: nodesKey,
   });
 
   return resolved;
