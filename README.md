@@ -17,6 +17,6 @@
 - [x] [Expo SDK57](https://expo.dev/changelog/sdk-57)
 - [x] [Unistyles 3.0](https://www.unistyl.es/v3/start/introduction)
 - [x] [React Native Skia](https://shopify.github.io/react-native-skia/)
-- [x] [Three.js](https://threejs.org/
+- [x] [Three.js](https://threejs.org/)
 - [x] [React Native WebGPU](https://github.com/wcandillon/react-native-webgpu)
 - [x] [TypeGPU](https://docs.swmansion.com/TypeGPU/integration/react-native/)
