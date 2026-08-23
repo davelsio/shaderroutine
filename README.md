@@ -1,6 +1,10 @@
 <h1 align="center">Shader Routine</h1>
 <p align="center"><i>Isolated experiments with shaders in React Native</i></p>
 
+## Description
+
+A bunch of experiments usings different kinds of shaders and techniques implemented in React Native.
+
 ## Features
 
 | Feature  | Link | Description |
