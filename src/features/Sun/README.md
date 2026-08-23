@@ -1,12 +1,16 @@
-This example is a Skia adaptation of the [main sequence star](https://www.shadertoy.com/view/4dXGR4) shader in [Shadertoy](https://www.shadertoy.com/).
+## Sun
 
-Besides the Skia-specific changes, I've made several modifications to the original shader to make it more interactive and easier to understand:
+Skia adaptation of the [main sequence star](https://www.shadertoy.com/view/4dXGR4) shader in [Shadertoy](https://www.shadertoy.com/).
 
-- [x] Unified the fragment position and made it relative to the radius, so all sun components scale and translate together.
-- [x] Removed the brightness diffuse and changed how its value affects the color components.
-- [x] Rewrote some of the logic to have a more controlled color behavior and component decomposition.
-- [x] Added uniforms to control colors, brightness, radius, and various corona effects.
+I wanted to learn how to create a 3D-looking structure from just a UV input, so I could implement it using only Skia.
 
-I started wanting to learn how to create a 3D-looking structure from just a UV input, so I could reimplement it using Skia. Then I noticed some inconsistencies related to texture sampling and transformations when trying to modify the scale or offset the position of the sun components, so I went ahead and fixed those too.
+## Features
 
-Overall, it got sufficient changes to say I kind of made it my own, but it still significantly reuses much of the original logic, including the value noise function for the corona effect or the texture sampling approach. I built a simple presets and tweaks UI on top to make it feel more interactive, and then added some haptics to the mix. Nothing too fancy, and I obviously need to work on my taste, but it's a start.
+- [x] Unified fragment position relative to the radius, so all sun components scale and translate together.
+- [x] Removed brightness diffuse and changed how the value affects color components.
+- [x] More controlled color behavior and component decomposition.
+- [x] UI controls for colors, brightness, radius, and various corona effects.
+
+### Preview
+
+https://github.com/user-attachments/assets/24c7cfaa-baac-486f-a6dc-64f354e6737c
