@@ -93,6 +93,7 @@ export function useTypeGPU(tgpuCallback: TgpuCallback, options?: TgpuOptions) {
       options,
       defaultOptions
     );
+
     const render = (t: number) => {
       const ts = t / 1000; // seconds
       let dt = ts - prev;
