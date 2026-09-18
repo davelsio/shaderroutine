@@ -15,21 +15,17 @@ let vNormal: THREE.VaryingNode<'vec3'>;
 
 // Helpers -------------------------------------------------------------
 
-const orthogonal = tsl.Fn(
-  ([normal]: [THREE.ConstNode<'vec3', THREE.Vector3>]) => {
-    return tsl.select(
-      tsl.abs(normal.x).greaterThan(tsl.abs(normal.z)),
-      tsl.vec3(tsl.normalize(tsl.vec3(tsl.negate(normal.y), normal.x, 0.0))),
-      tsl.vec3(tsl.normalize(tsl.vec3(0.0, tsl.negate(normal.z), normal.y)))
-    );
-  }
-);
+const orthogonal = tsl.Fn(([normal]: [THREE.Node<'vec3'>]) => {
+  return tsl.select(
+    tsl.abs(normal.x).greaterThan(tsl.abs(normal.z)),
+    tsl.vec3(tsl.normalize(tsl.vec3(tsl.negate(normal.y), normal.x, 0.0))),
+    tsl.vec3(tsl.normalize(tsl.vec3(0.0, tsl.negate(normal.z), normal.y)))
+  );
+});
 
-const getDisplacement = tsl.Fn(
-  ([pos]: [THREE.ConstNode<'vec3', THREE.Vector3>]) => {
-    return simplexNoise4d(tsl.vec4(pos.mul(0.5), tsl.time.mul(0.5))).mul(0.5);
-  }
-);
+const getDisplacement = tsl.Fn(([pos]: [THREE.Node<'vec3'>]) => {
+  return simplexNoise4d(tsl.vec4(pos.mul(0.5), tsl.time.mul(0.5))).mul(0.5);
+});
 
 // Nodes ----------------------------------------------------------------
 
