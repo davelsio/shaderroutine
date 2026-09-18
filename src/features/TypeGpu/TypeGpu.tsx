@@ -39,5 +39,5 @@ export function TypeGpu() {
     }
   );
 
-  return <Canvas ref={cbRef} style={style.canvas} transparent />;
+  return <Canvas ref={cbRef} style={style.canvas} />;
 }
